@@ -6,6 +6,17 @@ interface Settings {
   setNativeLanguage: (lang: Language) => void
   foreignLanguage: Language
   setForeignLanguage: (lang: Language) => void
+  artStyle: ArtStyle
+  setArtStyle: (style: ArtStyle) => void
+  autoPlayAudio: boolean
+  setAutoPlayAudio: (autoPlay: boolean) => void
+}
+
+export enum ArtStyle {
+  ANIME = 'anime',
+  PIXEL = 'pixel',
+  WATERCOLOR = 'watercolor',
+  PHOTOREALISTIC = 'photorealistic'
 }
 
 /**
@@ -37,12 +48,18 @@ interface SettingsProviderProps {
 export const SettingsProvider: React.FC<SettingsProviderProps> = props => {
   const [nativeLanguage, setNativeLanguage] = useState<Language>()
   const [foreignLanguage, setForeignLanguage] = useState<Language>()
+  const [artStyle, setArtStyle] = useState<ArtStyle>(ArtStyle.ANIME)
+  const [autoPlayAudio, setAutoPlayAudio] = useState(true)
 
   const value = {
     nativeLanguage: nativeLanguage!,
     setNativeLanguage,
     foreignLanguage: foreignLanguage!,
-    setForeignLanguage
+    setForeignLanguage,
+    artStyle,
+    setArtStyle,
+    autoPlayAudio,
+    setAutoPlayAudio
   }
 
   return (

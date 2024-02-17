@@ -7,7 +7,11 @@ interface ChatBubbleProps {
 }
 
 export const ChatBubble: React.FC<ChatBubbleProps> = props => {
-if (props.message.role === 'system') {
+  if (props.message.role === 'system') {
+    return <></>
+  }
+
+  if (props.message.content.length === 0) {
     return <></>
   }
 

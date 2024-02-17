@@ -1,8 +1,10 @@
 import React, { ReactNode, useState } from 'react'
-import { TogetherClient, togetherClient } from 'together-ai-sdk'
+import { TogetherChatModel, TogetherClient, TogetherImageModel, togetherClient } from 'together-ai-sdk'
 
 interface API {
   togetherAi: TogetherClient
+  instruct: (input: string) => Promise<string>
+  image: (input: string) => Promise<string>
 }
 
 /**
@@ -35,7 +37,21 @@ export const ApiProvider: React.FC<ApiProviderProps> = props => {
   const [togetherAi, _] = useState(togetherClient({ apiKey: TOGETHER_API_KEY, customFetch: window.fetch.bind(window) }))
 
   const value = {
-    togetherAi
+    togetherAi,
+    instruct: async (input: string): Promise<string> => {
+      const response = await togetherAi.chat({
+        model: TogetherChatModel.Code_Llama_Instruct_70B,
+        messages: [{ role: 'system', content: input }]
+      })
+      return response.choices[0].message.content
+    },
+    image: async (input: string): Promise<string> => {
+      const response = await togetherAi.image({
+        model: TogetherImageModel.Stable_Diffusion_XL_1_0,
+        prompt: input
+      })
+      return response.output.choices[0].imageBase64
+    }
   }
 
   return (

@@ -1,7 +1,8 @@
 import React, { ReactNode, useState } from 'react'
-import { ChatMessage, TogetherChatModel, TogetherImageModel } from 'together-ai-sdk'
+import { ChatMessage, TogetherChatModel } from 'together-ai-sdk'
 import { useAsyncEffect } from '../utils/useAsyncEffect'
 import { useAPI } from './apiContext'
+import { ArtStyle, useSettings } from './SettingsContext'
 
 interface ChatContext {
   chats: ChatData[]
@@ -17,7 +18,8 @@ export interface ChatData {
 
 interface ChatAgent {
   name: string
-  initialPrompt: string
+  initialChatPrompt: string
+  baseImagePrompt: string
   baseImage?: string
   responsiveImage?: string
 }
@@ -50,31 +52,28 @@ interface ChatInfoProviderProps {
  */
 export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
   const api = useAPI()
+  const { artStyle, autoPlayAudio } = useSettings()
   const [chats, setChats] = useState<ChatContext['chats']>([{ messages: [{ role: 'assistant', content: '' }], agent: createHandler() }])
 
   // Generate the base & thinking image for the handler
   useAsyncEffect(async (): Promise<void> => {
-    const handlerBaseImage = await api.togetherAi.image({
-      model: TogetherImageModel.Stable_Diffusion_XL_1_0,
-      prompt: 'A secret agent with sunglasses, a hat, and a trench coat'
-    })
+    const handlerBaseImage = await api.image(chats[0].agent.baseImagePrompt)
 
     setChats(chats => {
       return [{
         ...chats[0],
         agent: {
           ...chats[0].agent,
-          baseImage: handlerBaseImage.output.choices[0].imageBase64
+          baseImage: handlerBaseImage
         }
       }, ...chats.slice(1)]
     })
   }, [])
 
   const chatAgent = async (index: number, messages: ChatMessage[]): Promise<void> => {
-    console.log(messages)
     await api.togetherAi.chat({
       model: TogetherChatModel.Code_Llama_Instruct_70B,
-      messages: [{ role: 'system', content: chats[index].agent.initialPrompt }, ...messages.slice(0, -1)],
+      messages: [{ role: 'system', content: chats[index].agent.initialChatPrompt }, ...messages.slice(0, -1)],
       streamCallback: v => {
         if (v !== 'done') {
           setChats(chats => {
@@ -86,6 +85,20 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
           })
         }
       }
+    })
+  }
+
+  const generateResponsiveImage = async (index: number): Promise<void> => {
+    const imagePrompt = await createImagePrompt(chats[index])
+
+    const image = await api.image(imagePrompt)
+
+    setChats(chats => {
+      const newChats = [...chats]
+
+      newChats[index].agent.responsiveImage = image
+
+      return newChats
     })
   }
 
@@ -104,6 +117,24 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
     setChats(newChats)
 
     await chatAgent(index, newChats[index].messages)
+
+    // Do not await this, as it is not necessary to wait for the image to be generated
+    void generateResponsiveImage(index)
+  }
+
+  const createImagePrompt = async (chatInfo: ChatData): Promise<string> => {
+    const systemPrompt = 'Create a description of an image representing the latest response from the assistant. Include details about what the character is doing and the environment they are in. Describe what the character is wearing and what they are holding.'
+
+    const repsonsiveImagePrompt = await api.togetherAi.chat({
+      model: TogetherChatModel.Code_Llama_Instruct_70B,
+      messages: [
+        { role: 'system', content: chatInfo.agent.initialChatPrompt },
+        ...chatInfo.messages,
+        { role: 'system', content: systemPrompt}
+      ]
+    })
+
+    return chatInfo.agent.baseImagePrompt + '. ' + repsonsiveImagePrompt.choices[0].message.content + ' ' + createArtStylePrompt(artStyle)
   }
 
   const value = {
@@ -127,6 +158,20 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
 const createHandler = (): ChatAgent => {
   return {
     name: 'Handler',
-    initialPrompt: 'Your name is Handler. You are a super spy who is training the user on how to learn foreign languages. You are very serious. Introduce yourself.',
+    initialChatPrompt: 'Your name is Handler. You are a super spy who is training the user on how to learn foreign languages. You are very serious. Introduce yourself.',
+    baseImagePrompt: 'A serious spy with sunglasses and a suit. Only show one spy. The spy is in the center of the image.',
+  }
+}
+
+const createArtStylePrompt = (artStyle: ArtStyle): string => {
+  switch (artStyle) {
+    case ArtStyle.ANIME:
+      return 'The image should be drawn in an anime style.'
+    case ArtStyle.PIXEL:
+      return 'The image should be drawn in a pixel art style.'
+    case ArtStyle.WATERCOLOR:
+      return 'The image should be drawn in a watercolor style.'
+    case ArtStyle.PHOTOREALISTIC:
+      return 'The image should be photo realistic.'
   }
 }
