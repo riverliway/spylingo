@@ -5,6 +5,7 @@ interface API {
   togetherAi: TogetherClient
   instruct: (input: string) => Promise<string>
   image: (input: string) => Promise<string>
+  playAudio: (input: string, voiceId: string) => Promise<void>
 }
 
 /**
@@ -34,7 +35,7 @@ interface ApiProviderProps {
  * ApiProvider.Provider
  */
 export const ApiProvider: React.FC<ApiProviderProps> = props => {
-  const [togetherAi, _] = useState(togetherClient({ apiKey: TOGETHER_API_KEY, customFetch: window.fetch.bind(window) }))
+  const [togetherAi, _setTogetherAi] = useState(togetherClient({ apiKey: TOGETHER_API_KEY, customFetch: window.fetch.bind(window) }))
 
   const value = {
     togetherAi,
@@ -51,6 +52,34 @@ export const ApiProvider: React.FC<ApiProviderProps> = props => {
         prompt: input
       })
       return response.output.choices[0].imageBase64
+    },
+    playAudio: async (input: string, voiceId: string): Promise<void> => {
+      const params = {
+        model_id: 'eleven_monolingual_v1',
+        text: input,
+        voice_settings: {
+          similarity_boost: 0.5,
+          stability: 0.8,
+          style: 0,
+          use_speaker_boost: true
+        }
+      }
+
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'xi-api-key': ELEVEN_LABS_KEY
+        },
+        body: JSON.stringify(params)
+      }
+
+      const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, options)
+
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+
+      new Audio(url).play()
     }
   }
 

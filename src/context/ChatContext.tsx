@@ -22,6 +22,7 @@ interface ChatAgent {
   baseImagePrompt: string
   baseImage?: string
   responsiveImage?: string
+  voiceId: string
 }
 
 /**
@@ -86,6 +87,11 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
         }
       }
     })
+
+    if (autoPlayAudio) {
+      const messages = chats[index].messages
+      await api.playAudio(messages[messages.length - 1].content, chats[index].agent.voiceId)
+    }
   }
 
   const generateResponsiveImage = async (index: number): Promise<void> => {
@@ -158,8 +164,9 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
 const createHandler = (): ChatAgent => {
   return {
     name: 'Handler',
+    voiceId: 'pNInz6obpgDQGcFmaJgB',
     initialChatPrompt: 'Your name is Handler. You are a super spy who is training the user on how to learn foreign languages. You are very serious. Introduce yourself.',
-    baseImagePrompt: 'A serious spy with sunglasses and a suit. Only show one spy. The spy is in the center of the image.',
+    baseImagePrompt: 'Draw a character that is a spy. The character is wearing a hat and a suit.',
   }
 }
 

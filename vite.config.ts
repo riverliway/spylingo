@@ -8,6 +8,7 @@ export default defineConfig({
     react()
   ],
   define: {
-    TOGETHER_API_KEY: JSON.stringify(process.env.TOGETHER_API_KEY)
+    TOGETHER_API_KEY: JSON.stringify(process.env.TOGETHER_API_KEY),
+    ELEVEN_LABS_KEY: JSON.stringify(process.env.ELEVEN_LABS_KEY)
   }
 })
