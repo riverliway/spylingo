@@ -4,3 +4,74 @@
   width: 100%;
   height: 100vh;
 }
+
+.imageContain {
+  width: 40%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.chatImage {
+  width: 800px;
+  height: 100vh;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  position: relative;
+}
+
+.chatInterface {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.chatHistoryContain {
+  width: calc(100% - 16px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 8px;
+  overflow: scroll;
+  height: calc(100vh - 100px);
+}
+
+.chatMessageContain {
+  width: 100%;
+  height: 100px;
+  border-top: 1px solid #656565;
+  padding: 8px;
+  background-color: #393939;
+  display: flex;
+}
+
+.chatMessageInput {
+  width: 820px;
+  height: 92px;
+  max-height: 92px;
+  overflow: scroll;
+}
+
+.chatSendButton {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  background-color: #5f67ee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+}
+
+.chatSendButton:hover {
+  background-color: #4f56d1;
+}
+
+.chatSendButtonDisabled {
+  cursor: not-allowed;
+  background-color: #656565;
+}
+
+.chatSendButtonDisabled:hover {
+  background-color: #656565;
+}

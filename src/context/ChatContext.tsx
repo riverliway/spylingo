@@ -1,11 +1,12 @@
 import React, { ReactNode, useState } from 'react'
-import { ChatMessage, TogetherImageModel } from 'together-ai-sdk'
+import { ChatMessage, TogetherChatModel, TogetherImageModel } from 'together-ai-sdk'
 import { useAsyncEffect } from '../utils/useAsyncEffect'
 import { useAPI } from './apiContext'
 
 interface ChatContext {
   chats: ChatData[]
   createNewChat: (agent: ChatAgent) => void
+  sendMessage: (index: number, content: string) => Promise<void>
 }
 
 export interface ChatData {
@@ -49,7 +50,7 @@ interface ChatInfoProviderProps {
  */
 export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
   const api = useAPI()
-  const [chats, setChats] = useState<ChatContext['chats']>([{ messages: [], agent: createHandler() }])
+  const [chats, setChats] = useState<ChatContext['chats']>([{ messages: [{ role: 'assistant', content: 'hey lakjfasdfasdfsadfas sd fasdf asdf asf asfdsadf' }, { role: 'user', content: 'asdfasf iosusadfu u98 asdf aa' }], agent: createHandler() }])
 
   // Generate the base & thinking image for the handler
   useAsyncEffect(async (): Promise<void> => {
@@ -58,14 +59,12 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
       prompt: 'A secret agent with sunglasses, a hat, and a trench coat'
     })
 
-    console.log(handlerBaseImage.output.choices[0])
-
     setChats(chats => {
       return [{
         ...chats[0],
         agent: {
           ...chats[0].agent,
-          baseImage: handlerBaseImage.output.choices[0].image_base64
+          baseImage: handlerBaseImage.output.choices[0].imageBase64
         }
       }, ...chats.slice(1)]
     })
@@ -86,11 +85,51 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
     })
   }, [])
 
+  const sendMessage = async (index: number, content: string): Promise<void> => {
+    const newChats = [...chats]
+    newChats[index].messages.push({
+      role: 'user',
+      content
+    })
+
+    setChats(chat => {
+      const newChats = [...chats]
+      newChats[index].messages.push({
+        role: 'user',
+        content
+      })
+
+      newChats[index].messages.push({
+        role: 'assistant',
+        content: ''
+      })
+
+      return chat
+    })
+
+    await api.togetherAi.chat({
+      model: TogetherChatModel.Code_Llama_Instruct_70B,
+      messages: newChats[index].messages,
+      streamCallback: v => {
+        if (v !== 'done') {
+          setChats(chats => {
+            const newChats = [...chats]
+  
+            newChats[index].messages[newChats[index].messages.length - 1].content += v.choices[0].delta
+  
+            return newChats
+          })
+        }
+      }
+    })
+  }
+
   const value = {
     chats,
     createNewChat: (agent: ChatAgent) => {
       setChats([...chats, { messages: [], agent }])
-    }
+    },
+    sendMessage
   }
 
   return (
