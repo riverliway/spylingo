@@ -19,3 +19,9 @@
 .chatBubbleUser {
   background-color: #36354a;
 }
+
+.chatBubbleContents {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}

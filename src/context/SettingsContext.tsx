@@ -10,6 +10,8 @@ interface Settings {
   setArtStyle: (style: ArtStyle) => void
   autoPlayAudio: boolean
   setAutoPlayAudio: (autoPlay: boolean) => void
+  level: number
+  setLevel: (level: number) => void
 }
 
 export enum ArtStyle {
@@ -50,6 +52,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = props => {
   const [foreignLanguage, setForeignLanguage] = useState<Language>()
   const [artStyle, setArtStyle] = useState<ArtStyle>(ArtStyle.ANIME)
   const [autoPlayAudio, setAutoPlayAudio] = useState(false)
+  const [level, setLevel] = useState(0)
 
   const value = {
     nativeLanguage: nativeLanguage!,
@@ -59,7 +62,9 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = props => {
     artStyle,
     setArtStyle,
     autoPlayAudio,
-    setAutoPlayAudio
+    setAutoPlayAudio,
+    level,
+    setLevel
   }
 
   return (

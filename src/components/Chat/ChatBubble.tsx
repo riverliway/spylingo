@@ -1,6 +1,6 @@
 import React from 'react'
-import { ChatMessage } from 'together-ai-sdk'
 import './ChatBubble.css'
+import { ChatMessage } from '../../context/ChatContext'
 
 interface ChatBubbleProps {
   message: ChatMessage
@@ -21,7 +21,11 @@ export const ChatBubble: React.FC<ChatBubbleProps> = props => {
   return (
     <div className={`chatBubbleContain ${containClassName}`}>
       <div className={`chatBubble ${bubbleClassName}`}>
-        {props.message.content}
+        <div className='chatBubbleContents'>
+          <div>{props.message.content}</div>
+          {props.message.appendContent !== undefined && props.message.appendContent}
+        </div>
+        {props.message.extraContent !== undefined && <div className='chatBubbleExtra'>{props.message.extraContent}</div>}
       </div>
     </div>
   )

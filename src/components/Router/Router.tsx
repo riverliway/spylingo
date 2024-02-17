@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { ChooseLanguage } from '../ChooseLanguage/ChooseLanguage'
 import { ChatPage } from '../Chat/ChatPage'
 import { useChatInfo } from '../../context/ChatContext'
@@ -10,8 +10,7 @@ import { IntroAgent } from '../Chat/IntroAgent'
  */
 export const Router: React.FC = () => {
   const chatInfo = useChatInfo()
-  const { nativeLanguage, setNativeLanguage, foreignLanguage, setForeignLanguage } = useSettings()
-  const [level, setLevel] = useState(0)
+  const { nativeLanguage, setNativeLanguage, foreignLanguage, setForeignLanguage, level } = useSettings()
 
   if (nativeLanguage === undefined) {
     return (

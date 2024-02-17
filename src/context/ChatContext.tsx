@@ -1,5 +1,5 @@
 import React, { ReactNode, useState } from 'react'
-import { ChatMessage, TogetherChatModel } from 'together-ai-sdk'
+import { ChatMessage as ChatMessageRaw, TogetherChatModel } from 'together-ai-sdk'
 import { useAsyncEffect } from '../utils/useAsyncEffect'
 import { useAPI } from './apiContext'
 import { ArtStyle, useSettings } from './SettingsContext'
@@ -9,6 +9,19 @@ interface ChatContext {
   createNewChat: (agent: ChatAgent) => void
   sendMessage: (index: number, content: string) => Promise<void>
   introduce: (index: number) => Promise<void>
+  setAppendedContent: (messageIndex: number, content?: React.ReactNode) => void
+  setExtraContent: (messageIndex: number, content?: React.ReactNode) => void
+}
+
+export type ChatMessage = ChatMessageRaw & {
+    /**
+ * For adding extra content inside the chat bubble
+ */
+  appendContent?: React.ReactNode
+  /**
+   * For adding below the bubble
+   */
+  extraContent?: React.ReactNode
 }
 
 export interface ChatData {
@@ -53,7 +66,7 @@ interface ChatInfoProviderProps {
  */
 export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
   const api = useAPI()
-  const { artStyle, autoPlayAudio } = useSettings()
+  const { artStyle, autoPlayAudio, level, setLevel } = useSettings()
   const [chats, setChats] = useState<ChatContext['chats']>([{ messages: [{ role: 'assistant', content: '' }], agent: createHandler() }])
 
   // Generate the base & thinking image for the handler
@@ -151,6 +164,20 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
     sendMessage,
     introduce: async (index: number): Promise<void> => {
       await chatAgent(index, chats[index].messages)
+    },
+    setAppendedContent: (messageIndex: number, content?: React.ReactNode) => {
+      setChats(chats => {
+        const newChats = [...chats]
+        newChats[level].messages[messageIndex].appendContent = content
+        return newChats
+      })
+    },
+    setExtraContent: (messageIndex: number, content?: React.ReactNode) => {
+      setChats(chats => {
+        const newChats = [...chats]
+        newChats[level].messages[messageIndex].extraContent = content
+        return newChats
+      })
     }
   }
 
@@ -165,8 +192,8 @@ const createHandler = (): ChatAgent => {
   return {
     name: 'Handler',
     voiceId: 'pNInz6obpgDQGcFmaJgB',
-    initialChatPrompt: 'Your name is Handler. You are a super spy who is training the user on how to learn foreign languages. You are very serious. Introduce yourself.',
-    baseImagePrompt: 'Draw a character that is a spy. The character is wearing a hat and a suit.',
+    initialChatPrompt: 'Your name is Handler. You are a super spy who is training the user on how to learn foreign languages. You are very serious. Do not use emojis in your responses. Introduce yourself.',
+    baseImagePrompt: 'Draw an anime character that is a super spy. The character should be serious and should be wearing a suit. The character should be holding a briefcase. The character should be in a city environment. The character should be standing in front of a building. The character should be looking at the user. The character should be drawn in an anime style.',
   }
 }
 
