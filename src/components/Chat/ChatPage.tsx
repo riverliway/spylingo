@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { Input, Spin } from 'antd'
+import { SendOutlined } from '@ant-design/icons'
+
 import { ChatData, useChatInfo } from '../../context/ChatContext'
 import './ChatPage.css'
 import { ChatBubble } from './ChatBubble'
-import { SendOutlined } from '@ant-design/icons'
 
 export const ChatPage: React.FC<ChatData & { index: number }> = props => {
   const chatData = useChatInfo()
@@ -54,8 +55,6 @@ export const ChatPage: React.FC<ChatData & { index: number }> = props => {
 }
 
 const ChatImage: React.FC<ChatData & { responding: boolean; className: string }> = props => {
-  console.log(props.agent)
-
   if (props.responding) {
     if (props.agent.thinkingImage) {
       return <img className={props.className} src={`data:image/jpeg;base64, ${props.agent.thinkingImage}`} />
@@ -65,7 +64,7 @@ const ChatImage: React.FC<ChatData & { responding: boolean; className: string }>
       return <img className={props.className} src={`data:image/jpeg;base64, ${props.agent.baseImage}`} />
     }
 
-    return <div className={props.className}><Spin /></div>
+    return <div className='loadingChatImage'><Spin size='large' /></div>
   }
 
   if (props.messages.length > 0) {
@@ -82,5 +81,5 @@ const ChatImage: React.FC<ChatData & { responding: boolean; className: string }>
     return <img className={props.className} src={`data:image/jpeg;base64, ${props.agent.baseImage}`} />
   }
 
-  return <div className={props.className}><Spin /></div>
+  return <div className='loadingChatImage'><Spin size='large' /></div>
 }

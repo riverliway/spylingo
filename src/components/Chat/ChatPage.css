@@ -19,6 +19,14 @@
   position: relative;
 }
 
+.loadingChatImage {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .chatInterface {
   width: 60%;
   display: flex;
@@ -46,7 +54,7 @@
 }
 
 .chatMessageInput {
-  width: 820px;
+  width: calc(100% - 70px);
   height: 92px;
   max-height: 92px;
   overflow: scroll;

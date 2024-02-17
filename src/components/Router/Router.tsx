@@ -3,6 +3,7 @@ import { ChooseLanguage } from '../ChooseLanguage/ChooseLanguage'
 import { ChatPage } from '../Chat/ChatPage'
 import { useChatInfo } from '../../context/ChatContext'
 import { useSettings } from '../../context/SettingsContext'
+import { IntroAgent } from '../Chat/IntroAgent'
 
 /**
  * Determines which page to show
@@ -32,7 +33,11 @@ export const Router: React.FC = () => {
     )
   }
 
+  if (level === 0) {
+    return <IntroAgent />
+  }
+
   return (
-    <ChatPage {...chatInfo.chats[level]} />
+    <ChatPage {...{...chatInfo.chats[level], index: 0}} />
   )
 }

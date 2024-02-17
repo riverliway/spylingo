@@ -7,6 +7,7 @@ interface ChatContext {
   chats: ChatData[]
   createNewChat: (agent: ChatAgent) => void
   sendMessage: (index: number, content: string) => Promise<void>
+  introduce: (index: number) => Promise<void>
 }
 
 export interface ChatData {
@@ -16,7 +17,7 @@ export interface ChatData {
 
 interface ChatAgent {
   name: string
-  personality: string
+  initialPrompt: string
   baseImage?: string
   thinkingImage?: string
   responsiveImage?: string
@@ -50,7 +51,7 @@ interface ChatInfoProviderProps {
  */
 export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
   const api = useAPI()
-  const [chats, setChats] = useState<ChatContext['chats']>([{ messages: [{ role: 'assistant', content: 'hey lakjfasdfasdfsadfas sd fasdf asdf asf asfdsadf' }, { role: 'user', content: 'asdfasf iosusadfu u98 asdf aa' }], agent: createHandler() }])
+  const [chats, setChats] = useState<ChatContext['chats']>([{ messages: [{ role: 'assistant', content: '' }], agent: createHandler() }])
 
   // Generate the base & thinking image for the handler
   useAsyncEffect(async (): Promise<void> => {
@@ -85,37 +86,17 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
     })
   }, [])
 
-  const sendMessage = async (index: number, content: string): Promise<void> => {
-    const newChats = [...chats]
-    newChats[index].messages.push({
-      role: 'user',
-      content
-    })
-
-    setChats(chat => {
-      const newChats = [...chats]
-      newChats[index].messages.push({
-        role: 'user',
-        content
-      })
-
-      newChats[index].messages.push({
-        role: 'assistant',
-        content: ''
-      })
-
-      return chat
-    })
-
+  const chatAgent = async (index: number, messages: ChatMessage[]): Promise<void> => {
+    console.log(messages)
     await api.togetherAi.chat({
       model: TogetherChatModel.Code_Llama_Instruct_70B,
-      messages: newChats[index].messages,
+      messages: [{ role: 'system', content: chats[index].agent.initialPrompt }, ...messages.slice(0, -1)],
       streamCallback: v => {
         if (v !== 'done') {
           setChats(chats => {
             const newChats = [...chats]
   
-            newChats[index].messages[newChats[index].messages.length - 1].content += v.choices[0].delta
+            newChats[index].messages[newChats[index].messages.length - 1].content += v.choices[0].delta.content
   
             return newChats
           })
@@ -124,12 +105,32 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
     })
   }
 
+  const sendMessage = async (index: number, content: string): Promise<void> => {
+    const newChats = [...chats]
+    newChats[index].messages.push({
+      role: 'user',
+      content
+    })
+
+    newChats[index].messages.push({
+      role: 'assistant',
+      content: ''
+    })
+
+    setChats(newChats)
+
+    await chatAgent(index, newChats[index].messages)
+  }
+
   const value = {
     chats,
     createNewChat: (agent: ChatAgent) => {
       setChats([...chats, { messages: [], agent }])
     },
-    sendMessage
+    sendMessage,
+    introduce: async (index: number): Promise<void> => {
+      await chatAgent(index, chats[index].messages)
+    }
   }
 
   return (
@@ -142,6 +143,6 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
 const createHandler = (): ChatAgent => {
   return {
     name: 'Handler',
-    personality: 'friendly',
+    initialPrompt: 'Your name is Handler. You are a super spy who is training the user on how to learn foreign languages. You are very serious. Introduce yourself.',
   }
 }

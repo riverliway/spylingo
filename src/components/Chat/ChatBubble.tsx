@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { ChatMessage } from 'together-ai-sdk'
 import './ChatBubble.css'
 
@@ -7,9 +7,7 @@ interface ChatBubbleProps {
 }
 
 export const ChatBubble: React.FC<ChatBubbleProps> = props => {
-  const [isResponding, setIsResponding] = useState(false)
-
-  if (props.message.role === 'system') {
+if (props.message.role === 'system') {
     return <></>
   }
 
