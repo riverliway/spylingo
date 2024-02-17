@@ -1,5 +1,6 @@
 import React from 'react'
 import { ConfigProvider, theme } from 'antd'
+import { Router } from './components/Router/Router'
 
 /**
  * The main component that wraps the entire application
@@ -7,7 +8,7 @@ import { ConfigProvider, theme } from 'antd'
 const App: React.FC = () => {
   return (
     <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
-      <div>Hello World!</div>
+      <Router />
     </ConfigProvider>
   )
 }

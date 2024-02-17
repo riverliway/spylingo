@@ -1,0 +1,72 @@
+.chooseLanguageContain {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  margin-top: 80px;
+}
+
+.chooseLanguageTitles {
+  display: flex;
+  flex-direction: column;
+}
+
+.chooseLanguageTitle {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.chooseLanguageSubtitle {
+  font-size: 1rem;
+  font-weight: 400;
+  margin-bottom: 1rem;
+  color: #909090;
+}
+
+.chooseLanguageOptions {
+  display: flex;
+  flex-direction: row;
+  width: 50%;
+  align-items: center;
+  justify-content: center;
+  margin-top: 60px;
+}
+
+.chooseLanguagePage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.chooseLanguageOption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 1rem;
+  cursor: pointer;
+  width: 50%;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  user-select: none;
+}
+
+.chooseLanguageOption:hover {
+  background-color: #404040;
+}
+
+.chooseLanguageOptionHidden:hover {
+  background-color: #242424;
+}
+
+.chooseLanguageOptionHidden {
+  color: #909090;
+  cursor: not-allowed;
+}
