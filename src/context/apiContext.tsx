@@ -1,11 +1,13 @@
-import React, { ReactNode, useState } from 'react'
+import React, { ReactNode, useRef, useState } from 'react'
 import { TogetherChatModel, TogetherClient, TogetherImageModel, togetherClient } from 'together-ai-sdk'
+import { asyncTimeout } from '../utils/asyncTimeout'
 
 interface API {
   togetherAi: TogetherClient
   instruct: (input: string) => Promise<string>
   image: (input: string) => Promise<string>
   playAudio: (input: string, voiceId: string) => Promise<void>
+  playAudioStream: (input: string, voiceId: string) => Promise<void>
 }
 
 /**
@@ -35,6 +37,7 @@ interface ApiProviderProps {
  * ApiProvider.Provider
  */
 export const ApiProvider: React.FC<ApiProviderProps> = props => {
+  const audioQueueRef = useRef<Array<{ prompt: string, audio: string }>>([])
   const [cachedAudio, setCachedAudio] = useState<Array<{ input: string, output: string }>>([])
   const [togetherAi, _setTogetherAi] = useState(togetherClient({ apiKey: TOGETHER_API_KEY, customFetch: window.fetch.bind(window) }))
 
@@ -44,6 +47,20 @@ export const ApiProvider: React.FC<ApiProviderProps> = props => {
       audio.play()
       audio.onended = _ => res()
     })
+  }
+
+  const playAudioQueue = async (prompt: string, input: string): Promise<void> => {
+    try {
+      while (audioQueueRef.current.length > 0 && (audioQueueRef.current[0].prompt !== prompt || audioQueueRef.current[0].audio === '')) {
+        await asyncTimeout(1)
+      }
+  
+      await playAudioFile(input)
+  
+      audioQueueRef.current = audioQueueRef.current.slice(1)
+    } catch {
+      audioQueueRef.current = audioQueueRef.current.slice(1)
+    }
   }
 
   const value = {
@@ -97,6 +114,44 @@ export const ApiProvider: React.FC<ApiProviderProps> = props => {
       setCachedAudio(c => [...c, { input, output: url }])
 
       await playAudioFile(url)
+    },
+    playAudioStream: async (input: string, voiceId: string): Promise<void> => {
+      audioQueueRef.current.push({ prompt: input, audio: '' })
+
+      const params = {
+        model_id: 'eleven_multilingual_v2',
+        text: input,
+        voice_settings: {
+          similarity_boost: 0.5,
+          stability: 0.8,
+          style: 0,
+          use_speaker_boost: true
+        },
+        optimize_streaming_latency: 1
+      }
+
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'xi-api-key': ELEVEN_LABS_KEY
+        },
+        body: JSON.stringify(params)
+      }
+
+      const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, options)
+
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+
+      audioQueueRef.current = audioQueueRef.current.map(audio => {
+        if (audio.prompt === input) {
+          audio.audio = url
+        }
+        return audio
+      })
+
+      playAudioQueue(input, url)
     }
   }
 

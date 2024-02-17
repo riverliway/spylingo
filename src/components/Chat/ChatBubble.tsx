@@ -1,7 +1,7 @@
 import React from 'react'
 import './ChatBubble.css'
 import { ChatMessage } from '../../context/ChatContext'
-import { SoundOutlined, TranslationOutlined } from '@ant-design/icons'
+import { CloseOutlined, SoundOutlined, TranslationOutlined } from '@ant-design/icons'
 
 interface ChatBubbleProps {
   message: ChatMessage | undefined
@@ -9,6 +9,8 @@ interface ChatBubbleProps {
   showActionItems: boolean
   isPlayingAudio: boolean
   playAudio: () => void
+  translateWholeMessage: () => void
+  clearExtraContent: () => void
 }
 
 export const ChatBubble: React.FC<ChatBubbleProps> = props => {
@@ -33,10 +35,16 @@ export const ChatBubble: React.FC<ChatBubbleProps> = props => {
         <div className='chatBubbleActionItems'>
           {props.showActionItems && (
             <>
-              <div className={`chatBubbleActionIcon ${props.isPlayingAudio ? 'chatBubbleActionIconDisabled' : ''}`} onClick={props.playAudio}>
+              <div
+                className={`chatBubbleActionIcon ${props.isPlayingAudio ? 'chatBubbleActionIconDisabled chatBubbleActionIconSelected' : ''}`}
+                onClick={props.playAudio}
+              >
                 <SoundOutlined />
               </div>
-              <div className='chatBubbleActionIcon'>
+              <div
+                className={`chatBubbleActionIcon ${props.message?.extraContent !== undefined ? 'chatBubbleActionIconSelected' : ''}`}
+                onClick={props.translateWholeMessage}
+              >
                 <TranslationOutlined />
               </div>
             </>
@@ -49,7 +57,12 @@ export const ChatBubble: React.FC<ChatBubbleProps> = props => {
             <div>{props.message?.content}</div>
             {props.message?.appendContent !== undefined && props.message.appendContent}
           </div>
-          {props.message?.extraContent !== undefined && <div className='chatBubbleExtra'>{props.message.extraContent}</div>}
+          {props.message?.extraContent !== undefined && (
+            <div className='chatBubbleExtra'>
+              <div>{props.message.extraContent}</div>
+              <CloseOutlined className='chatBubbleExtraClose' onClick={props.clearExtraContent} />
+            </div>
+          )}
         </div>
       )}
     </div>

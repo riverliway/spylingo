@@ -44,6 +44,8 @@ export const ChatPage: React.FC<ChatData & { index: number }> = props => {
             showActionItems={props.index === 0 ? false : hoverStates.includes(-1) || hoverStates.includes(0)}
             isPlayingAudio={props.messages[0].isPlayingAudio}
             playAudio={() => chatData.playAudio(0)}
+            translateWholeMessage={() => chatData.translateMessage(0)}
+            clearExtraContent={() => {}}
           />
           {props.messages.map((message, index) => (
             <ChatBubble
@@ -53,6 +55,8 @@ export const ChatPage: React.FC<ChatData & { index: number }> = props => {
               showActionItems={props.index === 0 ? false : hoverStates.includes(index) || hoverStates.includes(index + 1)}
               isPlayingAudio={props.messages.length > index + 1 ? props.messages[index + 1].isPlayingAudio : false}
               playAudio={() => chatData.playAudio(index + 1)}
+              translateWholeMessage={() => chatData.translateMessage(index + 1)}
+              clearExtraContent={() => chatData.clearExtraContent(index)}
             />
           ))}
         </div>

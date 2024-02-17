@@ -51,7 +51,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = props => {
   const [nativeLanguage, setNativeLanguage] = useState<Language>()
   const [foreignLanguage, setForeignLanguage] = useState<Language>()
   const [artStyle, setArtStyle] = useState<ArtStyle>(ArtStyle.ANIME)
-  const [autoPlayAudio, setAutoPlayAudio] = useState(false)
+  const [autoPlayAudio, setAutoPlayAudio] = useState(true)
   const [level, setLevel] = useState(0)
 
   const value = {

@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from 'react'
+import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import { ChatMessage as ChatMessageRaw, TogetherChatModel } from 'together-ai-sdk'
 import { useAsyncEffect } from '../utils/useAsyncEffect'
 import { useAPI } from './apiContext'
@@ -11,10 +11,12 @@ interface ChatContext {
   chats: ChatData[]
   createNewChat: (agent: ChatAgent) => void
   sendMessage: (index: number, content: string) => Promise<void>
-  introduce: (index: number) => Promise<void>
+  introduce: (index: number, doneCallback?: () => void) => Promise<void>
   setAppendedContent: (messageIndex: number, content?: React.ReactNode) => void
   setExtraContent: (messageIndex: number, content?: React.ReactNode) => void
   playAudio: (messageIndex: number) => Promise<void>
+  translateMessage: (messageIndex: number) => Promise<void>
+  clearExtraContent: (messageIndex: number) => void
 }
 
 export type ChatMessage = ChatMessageRaw & {
@@ -71,6 +73,7 @@ interface ChatInfoProviderProps {
  */
 export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
   const api = useAPI()
+  const streamQueueRef = useRef<{ messageIndex: number, queue: string[], done: () => void, calledDone: boolean }>({ messageIndex: 0, queue: [], done: () => {}, calledDone: false })
   const { artStyle, autoPlayAudio, level, nativeLanguage } = useSettings()
   const [chats, setChats] = useState<ChatContext['chats']>(createInitialChats())
 
@@ -95,26 +98,53 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
     }
   }, [])
 
-  const chatAgent = async (index: number, messages: ChatMessage[]): Promise<void> => {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (streamQueueRef.current.queue.length > 0) {
+        streamQueueRef.current.calledDone = false
+        const messageIndex = streamQueueRef.current.messageIndex
+
+        setChats(chats => {
+          const newChats = [...chats]
+          newChats[level].messages[messageIndex].content += streamQueueRef.current.queue[0]
+          streamQueueRef.current.queue = streamQueueRef.current.queue.slice(1)
+          return newChats
+        })
+      } else if (!streamQueueRef.current.calledDone) {
+        streamQueueRef.current.calledDone = true
+        streamQueueRef.current.done()
+      }
+    }, 100)
+
+    return () => clearInterval(interval)
+  }, [level])
+
+  const chatAgent = async (index: number, messages: ChatMessage[], doneCallback?: () => void): Promise<void> => {
+    let audioChunk = ''
+
     await api.togetherAi.chat({
       model: TogetherChatModel.Code_Llama_Instruct_70B,
       messages: [{ role: 'system', content: chats[index].agent.initialChatPrompt }, ...messages.slice(0, -1)],
       streamCallback: v => {
         if (v !== 'done') {
-          setChats(chats => {
-            const newChats = [...chats]
-  
-            newChats[index].messages[newChats[index].messages.length - 1].content += v.choices[0].delta.content
-  
-            return newChats
-          })
+          const newContent = v.choices[0].delta.content
+          audioChunk += newContent
+
+          streamQueueRef.current.messageIndex = chats[index].messages.length - 1
+          streamQueueRef.current.queue.push(newContent)
+          streamQueueRef.current.done = doneCallback ?? (() => {})
+
+          if (autoPlayAudio && ['.', '!', '?', '。', '！', '？'].some(c => audioChunk.trim().endsWith(c))) {
+            api.playAudioStream(audioChunk, chats[index].agent.voiceId)
+            audioChunk = ''
+          }
+        } else {
+          if (autoPlayAudio && audioChunk.trim().length > 0) {
+            api.playAudioStream(audioChunk, chats[index].agent.voiceId)
+          }
         }
       }
     })
-
-    if (autoPlayAudio) {
-      void playAudio(index)
-    }
   }
 
   const playAudio = async (messageIndex: number): Promise<void> => {
@@ -124,9 +154,7 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
       return newChats
     })
     const messages = chats[level].messages
-    console.log('starting')
     await api.playAudio(messages[messageIndex].content, chats[level].agent.voiceId)
-    console.log('done')
 
     setChats(chats => {
       const newChats = [...chats]
@@ -192,8 +220,8 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
       setChats([...chats, { messages: [], agent }])
     },
     sendMessage,
-    introduce: async (index: number): Promise<void> => {
-      await chatAgent(index, chats[index].messages)
+    introduce: async (index: number, doneCallback?: () => void): Promise<void> => {
+      await chatAgent(index, chats[index].messages, doneCallback)
     },
     setAppendedContent: (messageIndex: number, content?: React.ReactNode) => {
       setChats(chats => {
@@ -209,7 +237,38 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
         return newChats
       })
     },
-    playAudio
+    playAudio,
+    translateMessage: async (messageIndex: number): Promise<void> => {
+      const prompt = `You are a translation model. You always translate the previous message into a different language. Translate the following message into ${nativeLanguage}.`
+      const content = chats[level].messages[messageIndex].content
+      let translatedMessage = ''
+
+      await api.togetherAi.chat({
+        model: TogetherChatModel.Code_Llama_Instruct_70B,
+        messages: [{ role: 'system', content: prompt }, { role: 'user', content }],
+        streamCallback: v => {
+          if (v === 'done') return
+          translatedMessage += v.choices[0].delta.content
+
+          setChats(chats => {
+            const newChats = [...chats]
+            newChats[level].messages[messageIndex].extraContent = (
+              <div>
+                {translatedMessage}
+              </div>
+            )
+            return newChats
+          })
+        }
+      })
+    },
+    clearExtraContent: (messageIndex: number) => {
+      setChats(chats => {
+        const newChats = [...chats]
+        newChats[level].messages[messageIndex].extraContent = undefined
+        return newChats
+      })
+    }
   }
 
   return (
