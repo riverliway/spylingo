@@ -3,7 +3,9 @@ import { Language } from '../utils/languages'
 
 interface Settings {
   nativeLanguage: Language
+  setNativeLanguage: (lang: Language) => void
   foreignLanguage: Language
+  setForeignLanguage: (lang: Language) => void
 }
 
 /**
@@ -25,8 +27,6 @@ export const useSettings = (): Settings => {
 }
 
 interface SettingsProviderProps {
-  nativeLanguage: Language
-  foreignLanguage: Language
   children: ReactNode
 }
 
@@ -35,9 +35,14 @@ interface SettingsProviderProps {
  * SettingsProvider.Provider
  */
 export const SettingsProvider: React.FC<SettingsProviderProps> = props => {
+  const [nativeLanguage, setNativeLanguage] = useState<Language>()
+  const [foreignLanguage, setForeignLanguage] = useState<Language>()
+
   const value = {
-    nativeLanguage: props.nativeLanguage,
-    foreignLanguage: props.foreignLanguage
+    nativeLanguage: nativeLanguage!,
+    setNativeLanguage,
+    foreignLanguage: foreignLanguage!,
+    setForeignLanguage
   }
 
   return (

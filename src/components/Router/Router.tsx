@@ -1,13 +1,16 @@
 import React, { useState } from 'react'
-import { Language } from '../../utils/languages'
 import { ChooseLanguage } from '../ChooseLanguage/ChooseLanguage'
+import { ChatPage } from '../Chat/ChatPage'
+import { useChatInfo } from '../../context/ChatContext'
+import { useSettings } from '../../context/SettingsContext'
 
 /**
  * Determines which page to show
  */
 export const Router: React.FC = () => {
-  const [nativeLanguage, setNativeLanguage] = useState<Language | undefined>()
-  const [foreignLanguage, setForeignLanguage] = useState<Language | undefined>()
+  const chatInfo = useChatInfo()
+  const { nativeLanguage, setNativeLanguage, foreignLanguage, setForeignLanguage } = useSettings()
+  const [level, setLevel] = useState(0)
 
   if (nativeLanguage === undefined) {
     return (
@@ -30,8 +33,6 @@ export const Router: React.FC = () => {
   }
 
   return (
-    <div>
-      hi
-    </div>
+    <ChatPage {...chatInfo.chats[level]} />
   )
 }
