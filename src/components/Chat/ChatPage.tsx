@@ -55,26 +55,8 @@ export const ChatPage: React.FC<ChatData & { index: number }> = props => {
 }
 
 const ChatImage: React.FC<ChatData & { responding: boolean; className: string }> = props => {
-  if (props.responding) {
-    if (props.agent.thinkingImage) {
-      return <img className={props.className} src={`data:image/jpeg;base64, ${props.agent.thinkingImage}`} />
-    }
-
-    if (props.agent.baseImage) {
-      return <img className={props.className} src={`data:image/jpeg;base64, ${props.agent.baseImage}`} />
-    }
-
-    return <div className='loadingChatImage'><Spin size='large' /></div>
-  }
-
-  if (props.messages.length > 0) {
-    if (props.agent.responsiveImage) {
-      return <img className={props.className} src={`data:image/jpeg;base64, ${props.agent.responsiveImage}`} />
-    }
-
-    if (props.agent.thinkingImage) {
-      return <img className={props.className} src={`data:image/jpeg;base64, ${props.agent.thinkingImage}`} />
-    }
+  if (props.agent.responsiveImage) {
+    return <img className={props.className} src={`data:image/jpeg;base64, ${props.agent.responsiveImage}`} />
   }
 
   if (props.agent.baseImage) {

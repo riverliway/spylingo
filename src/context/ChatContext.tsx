@@ -19,7 +19,6 @@ interface ChatAgent {
   name: string
   initialPrompt: string
   baseImage?: string
-  thinkingImage?: string
   responsiveImage?: string
 }
 
@@ -66,21 +65,6 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
         agent: {
           ...chats[0].agent,
           baseImage: handlerBaseImage.output.choices[0].imageBase64
-        }
-      }, ...chats.slice(1)]
-    })
-
-    const handlerThinkingImage = await api.togetherAi.image({
-      model: TogetherImageModel.Stable_Diffusion_XL_1_0,
-      prompt: 'A secret agent with sunglasses, a hat, and a trench coat. They are thinking strongly about something.'
-    })
-
-    setChats(chats => {
-      return [{
-        ...chats[0],
-        agent: {
-          ...chats[0].agent,
-          thinkingImage: handlerThinkingImage.output.choices[0].imageBase64
         }
       }, ...chats.slice(1)]
     })
