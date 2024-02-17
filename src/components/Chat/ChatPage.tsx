@@ -5,8 +5,11 @@ import { SendOutlined } from '@ant-design/icons'
 import { ChatData, useChatInfo } from '../../context/ChatContext'
 import './ChatPage.css'
 import { ChatBubble } from './ChatBubble'
+import { typeMessagePrompt } from '../../utils/prompts'
+import { useSettings } from '../../context/SettingsContext'
 
 export const ChatPage: React.FC<ChatData & { index: number }> = props => {
+  const { nativeLanguage } = useSettings()
   const chatData = useChatInfo()
   const [sendingContent, setSendingContent] = useState('')
   const [isResponding, setIsResponding] = useState(false)
@@ -38,7 +41,7 @@ export const ChatPage: React.FC<ChatData & { index: number }> = props => {
           <Input.TextArea
             autoSize={{ minRows: 4 }}
             className='chatMessageInput'
-            placeholder={isResponding ? '' : 'Type a message...'}
+            placeholder={isResponding ? '' : typeMessagePrompt(nativeLanguage)}
             variant='borderless'
             value={sendingContent}
             onChange={e => setSendingContent(e.currentTarget.value)}
@@ -50,6 +53,10 @@ export const ChatPage: React.FC<ChatData & { index: number }> = props => {
           </div>
         </div>
       </div>
+      {props.index !== 0 && (
+        <div className='chatQuestBar'>
+        </div>
+      )}
     </div>
   )
 }

@@ -3,6 +3,7 @@ import { ChatMessage as ChatMessageRaw, TogetherChatModel } from 'together-ai-sd
 import { useAsyncEffect } from '../utils/useAsyncEffect'
 import { useAPI } from './apiContext'
 import { ArtStyle, useSettings } from './SettingsContext'
+import { handlerImage } from '../utils/constants'
 
 interface ChatContext {
   chats: ChatData[]
@@ -66,22 +67,20 @@ interface ChatInfoProviderProps {
  */
 export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
   const api = useAPI()
-  const { artStyle, autoPlayAudio, level, setLevel } = useSettings()
-  const [chats, setChats] = useState<ChatContext['chats']>([{ messages: [{ role: 'assistant', content: '' }], agent: createHandler() }])
+  const { artStyle, autoPlayAudio, level } = useSettings()
+  const [chats, setChats] = useState<ChatContext['chats']>(createInitialChats())
 
-  // Generate the base & thinking image for the handler
-  useAsyncEffect(async (): Promise<void> => {
-    const handlerBaseImage = await api.image(chats[0].agent.baseImagePrompt)
+  useAsyncEffect(async () => {
+    for (let i = 0; i < chats.length; i++) {
+      const image = await api.image(chats[i].agent.baseImagePrompt)
+      setChats(chats => {
+        const newChats = [...chats]
 
-    setChats(chats => {
-      return [{
-        ...chats[0],
-        agent: {
-          ...chats[0].agent,
-          baseImage: handlerBaseImage
-        }
-      }, ...chats.slice(1)]
-    })
+        newChats[i].agent.baseImage = image
+
+        return newChats
+      })
+    }
   }, [])
 
   const chatAgent = async (index: number, messages: ChatMessage[]): Promise<void> => {
@@ -188,11 +187,27 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
   )
 }
 
+const createInitialChats = (): ChatData[] => {
+  return [{
+    messages: [{ role: 'assistant', content: '' }],
+    agent: createHandler()
+  }, {
+    messages: [{ role: 'assistant', content: '' }],
+    agent: {
+      name: 'Mandy',
+      voiceId: 'jsCqWAovK2LkecY7zXl4',
+      baseImagePrompt: 'Draw an anime girl with pink hair. The character is wearing casual clothes and a skirt.',
+      initialChatPrompt: 'Your name is Mandy. You are a young girl who likes vegetables, sports, and playing with your friends. You really like carrots, but wait for the user to ask you what kinds of vegetables you like before telling them. You are very friendly. Introduce yourself.',
+    }
+  }]
+}
+
 const createHandler = (): ChatAgent => {
   return {
     name: 'Handler',
     voiceId: 'pNInz6obpgDQGcFmaJgB',
-    initialChatPrompt: 'Your name is Handler. You are a super spy who is training the user on how to learn foreign languages. You are very serious. Do not use emojis in your responses. Introduce yourself.',
+    baseImage: handlerImage,
+    initialChatPrompt: 'Your name is Handler. You are a super spy who is training the user on how to learn foreign languages. You are very serious. Do not use emojis in your responses. Introduce yourself. Explain to the user that they will be taking on missions to practice extracting information from foreign languages.',
     baseImagePrompt: 'Draw an anime character that is a super spy. The character should be serious and should be wearing a suit. The character should be holding a briefcase. The character should be in a city environment. The character should be standing in front of a building. The character should be looking at the user. The character should be drawn in an anime style.',
   }
 }

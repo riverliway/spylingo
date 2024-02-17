@@ -5,9 +5,10 @@ import { useAsyncEffect } from '../../utils/useAsyncEffect'
 import './IntroAgent.css'
 import { Button } from 'antd'
 import { useSettings } from '../../context/SettingsContext'
+import { chooseMissionPrompt, familyTimePrompt, foodAndDrinksPrompt, schoolLifePrompt, selectPrompt } from '../../utils/prompts'
 
 export const IntroAgent: React.FC = () => {
-  const { setLevel } = useSettings()
+  const { setLevel, nativeLanguage } = useSettings()
   const chatInfo = useChatInfo()
 
   useAsyncEffect(async (): Promise<void> => {
@@ -15,24 +16,24 @@ export const IntroAgent: React.FC = () => {
     chatInfo.setAppendedContent(0, (
       <div className='introChooseMission'>
         <div className='introMissionOption'>
-          We have three missions for you to choose from. Which one would you like to start with?
+          {chooseMissionPrompt(nativeLanguage)}
         </div>
         <div className='introMissionOption'>
-          <Button onClick={() => setLevel(1)}>Select</Button>
+          <Button onClick={() => setLevel(1)}>{selectPrompt(nativeLanguage)}</Button>
           <div>
-            Food & Drinks
+            {foodAndDrinksPrompt(nativeLanguage)}
           </div>
         </div>
         <div className='introMissionOption'>
-          <Button onClick={() => setLevel(2)}>Select</Button>
+          <Button onClick={() => setLevel(2)}>{selectPrompt(nativeLanguage)}</Button>
           <div>
-            School Life
+            {schoolLifePrompt(nativeLanguage)}
           </div>
         </div>
         <div className='introMissionOption'>
-          <Button onClick={() => setLevel(3)}>Select</Button>
+          <Button onClick={() => setLevel(3)}>{selectPrompt(nativeLanguage)}</Button>
           <div>
-            Family Time
+            {familyTimePrompt(nativeLanguage)}
           </div>
         </div>
       </div>

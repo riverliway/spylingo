@@ -83,3 +83,9 @@
 .chatSendButtonDisabled:hover {
   background-color: #656565;
 }
+
+.chatQuestBar {
+  width: 200px;
+  height: 100vh;
+  background-color: #333333;
+}

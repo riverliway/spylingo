@@ -1,22 +1,22 @@
 import React from 'react'
 import { ChooseLanguage } from '../ChooseLanguage/ChooseLanguage'
-import { ChatPage } from '../Chat/ChatPage'
-import { useChatInfo } from '../../context/ChatContext'
 import { useSettings } from '../../context/SettingsContext'
 import { IntroAgent } from '../Chat/IntroAgent'
+import { MissionAgent } from '../Chat/MissionAgent'
+import { selectForeignLanguagePrompt, selectForeignLanguageSubPrompt, selectNativeLanguagePrompt } from '../../utils/prompts'
+import { Language } from '../../utils/languages'
 
 /**
  * Determines which page to show
  */
 export const Router: React.FC = () => {
-  const chatInfo = useChatInfo()
   const { nativeLanguage, setNativeLanguage, foreignLanguage, setForeignLanguage, level } = useSettings()
 
   if (nativeLanguage === undefined) {
     return (
       <ChooseLanguage
-        title='Select your native language'
-        subTitle='Select your native language'
+        title={Object.values(Language).map(selectNativeLanguagePrompt)}
+        subTitle={selectNativeLanguagePrompt(Language.English)}
         setLanguage={setNativeLanguage}
       />
     )
@@ -25,7 +25,8 @@ export const Router: React.FC = () => {
   if (foreignLanguage === undefined) {
     return (
       <ChooseLanguage
-        title='Select the foreign language to practice'
+        title={selectForeignLanguagePrompt(nativeLanguage)}
+        subTitle={selectForeignLanguageSubPrompt(nativeLanguage)}
         setLanguage={setForeignLanguage}
         hiddenLanguage={nativeLanguage}
       />
@@ -37,6 +38,6 @@ export const Router: React.FC = () => {
   }
 
   return (
-    <ChatPage {...{...chatInfo.chats[level], index: 0}} />
+    <MissionAgent />
   )
 }
