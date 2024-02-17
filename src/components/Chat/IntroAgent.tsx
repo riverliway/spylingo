@@ -12,32 +12,35 @@ export const IntroAgent: React.FC = () => {
   const chatInfo = useChatInfo()
 
   useAsyncEffect(async (): Promise<void> => {
-    await chatInfo.introduce(0)
-    chatInfo.setAppendedContent(0, (
-      <div className='introChooseMission'>
-        <div className='introMissionOption'>
-          {chooseMissionPrompt(nativeLanguage)}
-        </div>
-        <div className='introMissionOption'>
-          <Button onClick={() => setLevel(1)}>{selectPrompt(nativeLanguage)}</Button>
-          <div>
-            {foodAndDrinksPrompt(nativeLanguage)}
+    const messages = chatInfo.chats[0].messages.filter(message => message.role !== 'system')
+    if (messages.length === 1 && messages[0].content === '') {
+      await chatInfo.introduce(0)
+      chatInfo.setAppendedContent(0, (
+        <div className='introChooseMission'>
+          <div className='introMissionOption'>
+            {chooseMissionPrompt(nativeLanguage)}
+          </div>
+          <div className='introMissionOption'>
+            <Button onClick={() => setLevel(1)}>{selectPrompt(nativeLanguage)}</Button>
+            <div>
+              {foodAndDrinksPrompt(nativeLanguage)}
+            </div>
+          </div>
+          <div className='introMissionOption'>
+            <Button onClick={() => setLevel(2)}>{selectPrompt(nativeLanguage)}</Button>
+            <div>
+              {schoolLifePrompt(nativeLanguage)}
+            </div>
+          </div>
+          <div className='introMissionOption'>
+            <Button onClick={() => setLevel(3)}>{selectPrompt(nativeLanguage)}</Button>
+            <div>
+              {familyTimePrompt(nativeLanguage)}
+            </div>
           </div>
         </div>
-        <div className='introMissionOption'>
-          <Button onClick={() => setLevel(2)}>{selectPrompt(nativeLanguage)}</Button>
-          <div>
-            {schoolLifePrompt(nativeLanguage)}
-          </div>
-        </div>
-        <div className='introMissionOption'>
-          <Button onClick={() => setLevel(3)}>{selectPrompt(nativeLanguage)}</Button>
-          <div>
-            {familyTimePrompt(nativeLanguage)}
-          </div>
-        </div>
-      </div>
-    ))
+      ))
+    }
   }, [])
 
   return (

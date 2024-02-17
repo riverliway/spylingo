@@ -1,9 +1,11 @@
-import React, { ReactNode, useState } from 'react'
+import React, { ReactNode, useEffect, useState } from 'react'
 import { ChatMessage as ChatMessageRaw, TogetherChatModel } from 'together-ai-sdk'
 import { useAsyncEffect } from '../utils/useAsyncEffect'
 import { useAPI } from './apiContext'
 import { ArtStyle, useSettings } from './SettingsContext'
 import { handlerImage } from '../utils/constants'
+import { handlerInitialChatPrompt } from '../utils/prompts'
+import { Language } from '../utils/languages'
 
 interface ChatContext {
   chats: ChatData[]
@@ -12,6 +14,7 @@ interface ChatContext {
   introduce: (index: number) => Promise<void>
   setAppendedContent: (messageIndex: number, content?: React.ReactNode) => void
   setExtraContent: (messageIndex: number, content?: React.ReactNode) => void
+  playAudio: (messageIndex: number) => Promise<void>
 }
 
 export type ChatMessage = ChatMessageRaw & {
@@ -23,6 +26,7 @@ export type ChatMessage = ChatMessageRaw & {
    * For adding below the bubble
    */
   extraContent?: React.ReactNode
+  isPlayingAudio: boolean
 }
 
 export interface ChatData {
@@ -67,11 +71,19 @@ interface ChatInfoProviderProps {
  */
 export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
   const api = useAPI()
-  const { artStyle, autoPlayAudio, level } = useSettings()
+  const { artStyle, autoPlayAudio, level, nativeLanguage } = useSettings()
   const [chats, setChats] = useState<ChatContext['chats']>(createInitialChats())
 
+  useEffect(() => {
+    setChats(chats => {
+      const newChats = [...chats]
+      newChats[0].agent.initialChatPrompt = handlerInitialChatPrompt(nativeLanguage)
+      return newChats
+    })
+  }, [nativeLanguage])
+
   useAsyncEffect(async () => {
-    for (let i = 0; i < chats.length; i++) {
+    for (let i = 1; i < chats.length; i++) {
       const image = await api.image(chats[i].agent.baseImagePrompt)
       setChats(chats => {
         const newChats = [...chats]
@@ -101,9 +113,26 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
     })
 
     if (autoPlayAudio) {
-      const messages = chats[index].messages
-      await api.playAudio(messages[messages.length - 1].content, chats[index].agent.voiceId)
+      void playAudio(index)
     }
+  }
+
+  const playAudio = async (messageIndex: number): Promise<void> => {
+    setChats(chats => {
+      const newChats = [...chats]
+      newChats[level].messages[messageIndex].isPlayingAudio = true
+      return newChats
+    })
+    const messages = chats[level].messages
+    console.log('starting')
+    await api.playAudio(messages[messageIndex].content, chats[level].agent.voiceId)
+    console.log('done')
+
+    setChats(chats => {
+      const newChats = [...chats]
+      newChats[level].messages[messageIndex].isPlayingAudio = false
+      return newChats
+    })
   }
 
   const generateResponsiveImage = async (index: number): Promise<void> => {
@@ -124,12 +153,14 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
     const newChats = [...chats]
     newChats[index].messages.push({
       role: 'user',
-      content
+      content,
+      isPlayingAudio: false
     })
 
     newChats[index].messages.push({
       role: 'assistant',
-      content: ''
+      content: '',
+      isPlayingAudio: false
     })
 
     setChats(newChats)
@@ -177,7 +208,8 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
         newChats[level].messages[messageIndex].extraContent = content
         return newChats
       })
-    }
+    },
+    playAudio
   }
 
   return (
@@ -189,10 +221,10 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
 
 const createInitialChats = (): ChatData[] => {
   return [{
-    messages: [{ role: 'assistant', content: '' }],
+    messages: [{ role: 'assistant', content: '', isPlayingAudio: false }],
     agent: createHandler()
   }, {
-    messages: [{ role: 'assistant', content: '' }],
+    messages: [{ role: 'assistant', content: '', isPlayingAudio: false }],
     agent: {
       name: 'Mandy',
       voiceId: 'jsCqWAovK2LkecY7zXl4',
@@ -207,7 +239,7 @@ const createHandler = (): ChatAgent => {
     name: 'Handler',
     voiceId: 'pNInz6obpgDQGcFmaJgB',
     baseImage: handlerImage,
-    initialChatPrompt: 'Your name is Handler. You are a super spy who is training the user on how to learn foreign languages. You are very serious. Do not use emojis in your responses. Introduce yourself. Explain to the user that they will be taking on missions to practice extracting information from foreign languages.',
+    initialChatPrompt: handlerInitialChatPrompt(Language.English),
     baseImagePrompt: 'Draw an anime character that is a super spy. The character should be serious and should be wearing a suit. The character should be holding a briefcase. The character should be in a city environment. The character should be standing in front of a building. The character should be looking at the user. The character should be drawn in an anime style.',
   }
 }

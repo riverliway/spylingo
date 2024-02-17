@@ -10,7 +10,11 @@ export const MissionAgent: React.FC = () => {
   const chatInfo = useChatInfo()
 
   useAsyncEffect(async () => {
-    await chatInfo.introduce(level)
+    const messages = chatInfo.chats[level].messages.filter(message => message.role !== 'system')
+    console.log(messages)
+    if (messages.length === 1 && messages[0].content === '') {
+      await chatInfo.introduce(level)
+    }
   }, [level])
 
   return (

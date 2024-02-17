@@ -35,7 +35,16 @@ interface ApiProviderProps {
  * ApiProvider.Provider
  */
 export const ApiProvider: React.FC<ApiProviderProps> = props => {
+  const [cachedAudio, setCachedAudio] = useState<Array<{ input: string, output: string }>>([])
   const [togetherAi, _setTogetherAi] = useState(togetherClient({ apiKey: TOGETHER_API_KEY, customFetch: window.fetch.bind(window) }))
+
+  const playAudioFile = async (input: string): Promise<void> => {
+    return new Promise(res => {
+      const audio = new Audio(input)
+      audio.play()
+      audio.onended = _ => res()
+    })
+  }
 
   const value = {
     togetherAi,
@@ -54,8 +63,14 @@ export const ApiProvider: React.FC<ApiProviderProps> = props => {
       return response.output.choices[0].imageBase64
     },
     playAudio: async (input: string, voiceId: string): Promise<void> => {
+      const cachedAudioUrl = cachedAudio.find(audio => audio.input === input)
+      if (cachedAudioUrl !== undefined) {
+        await playAudioFile(cachedAudioUrl.output)
+        return
+      }
+
       const params = {
-        model_id: 'eleven_monolingual_v1',
+        model_id: 'eleven_multilingual_v2',
         text: input,
         voice_settings: {
           similarity_boost: 0.5,
@@ -79,7 +94,9 @@ export const ApiProvider: React.FC<ApiProviderProps> = props => {
       const blob = await response.blob()
       const url = URL.createObjectURL(blob)
 
-      new Audio(url).play()
+      setCachedAudio(c => [...c, { input, output: url }])
+
+      await playAudioFile(url)
     }
   }
 

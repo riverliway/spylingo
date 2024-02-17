@@ -1,18 +1,21 @@
 import React, { useState } from 'react'
 import { Input, Spin } from 'antd'
-import { SendOutlined } from '@ant-design/icons'
+import { LogoutOutlined, SendOutlined, SettingOutlined } from '@ant-design/icons'
 
 import { ChatData, useChatInfo } from '../../context/ChatContext'
 import './ChatPage.css'
 import { ChatBubble } from './ChatBubble'
-import { typeMessagePrompt } from '../../utils/prompts'
+import { exitPrompt, settingsPrompt, typeMessagePrompt } from '../../utils/prompts'
 import { useSettings } from '../../context/SettingsContext'
+import { SettingsModal } from '../SettingsModal/SettingsModal'
 
 export const ChatPage: React.FC<ChatData & { index: number }> = props => {
-  const { nativeLanguage } = useSettings()
+  const { nativeLanguage, setLevel } = useSettings()
   const chatData = useChatInfo()
   const [sendingContent, setSendingContent] = useState('')
   const [isResponding, setIsResponding] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [hoverStates, setHoverStates] = useState<number[]>([])
 
   const sendMessage = async (): Promise<void> => {
     if (sendingContent.length === 0) return
@@ -28,13 +31,29 @@ export const ChatPage: React.FC<ChatData & { index: number }> = props => {
   
   return (
     <div className='chatWindowContain'>
+      <SettingsModal open={settingsOpen} close={() => setSettingsOpen(false)} />
       <div className='imageContain'>
         <ChatImage {...props} responding={isResponding} className='chatImage' />
       </div>
       <div className='chatInterface'>
         <div className='chatHistoryContain'>
-          {props.messages.map((message, i) => (
-            <ChatBubble key={i} message={message} />
+          <ChatBubble
+            key={-1}
+            message={undefined}
+            onHover={isHovering => setHoverStates(h => h.filter(i => i !== -1).concat(isHovering ? [-1] : []))}
+            showActionItems={props.index === 0 ? false : hoverStates.includes(-1) || hoverStates.includes(0)}
+            isPlayingAudio={props.messages[0].isPlayingAudio}
+            playAudio={() => chatData.playAudio(0)}
+          />
+          {props.messages.map((message, index) => (
+            <ChatBubble
+              key={index}
+              message={message}
+              onHover={isHovering => setHoverStates(h => h.filter(i => i !== index).concat(isHovering ? [index] : []))}
+              showActionItems={props.index === 0 ? false : hoverStates.includes(index) || hoverStates.includes(index + 1)}
+              isPlayingAudio={props.messages.length > index + 1 ? props.messages[index + 1].isPlayingAudio : false}
+              playAudio={() => chatData.playAudio(index + 1)}
+            />
           ))}
         </div>
         <div className='chatMessageContain'> 
@@ -55,6 +74,17 @@ export const ChatPage: React.FC<ChatData & { index: number }> = props => {
       </div>
       {props.index !== 0 && (
         <div className='chatQuestBar'>
+          <div>quest items</div>
+          <div className='chatQuestMenu'>
+            <div className='chatQuestMenuItem' onClick={() => setSettingsOpen(true)}>
+              <SettingOutlined />
+              {settingsPrompt(nativeLanguage)}
+            </div>
+            <div className='chatQuestMenuItem' onClick={() => setLevel(0)}>
+              <LogoutOutlined />
+              {exitPrompt(nativeLanguage)}
+            </div>
+          </div>
         </div>
       )}
     </div>
