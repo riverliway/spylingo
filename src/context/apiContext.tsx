@@ -1,11 +1,14 @@
 import React, { ReactNode, useRef, useState } from 'react'
 import { TogetherChatModel, TogetherClient, TogetherImageModel, togetherClient } from 'together-ai-sdk'
 import { asyncTimeout } from '../utils/asyncTimeout'
+import { Language } from '../utils/languages'
+import { translateSentencePrompt } from '../utils/prompts'
 
 interface API {
   togetherAi: TogetherClient
   instruct: (input: string) => Promise<string>
   image: (input: string) => Promise<string>
+  translate: (input: string, to: Language, callback?: (delta: string) => void) => Promise<string>
   playAudio: (input: string, voiceId: string) => Promise<void>
   playAudioStream: (input: string, voiceId: string) => Promise<void>
 }
@@ -67,7 +70,7 @@ export const ApiProvider: React.FC<ApiProviderProps> = props => {
     togetherAi,
     instruct: async (input: string): Promise<string> => {
       const response = await togetherAi.chat({
-        model: TogetherChatModel.Code_Llama_Instruct_70B,
+        model: TogetherChatModel.Qwen_1_5_Chat_72B,
         messages: [{ role: 'system', content: input }]
       })
       return response.choices[0].message.content
@@ -152,6 +155,17 @@ export const ApiProvider: React.FC<ApiProviderProps> = props => {
       })
 
       playAudioQueue(input, url)
+    },
+    translate: async (input: string, to: Language, callback?: (delta: string) => void): Promise<string> => {
+      const prompt = translateSentencePrompt(to)
+
+      const response = await togetherAi.chat({
+        model: TogetherChatModel.Qwen_1_5_Chat_72B,
+        messages: [{ role: 'system', content: prompt }, { role: 'user', content: input }],
+        streamCallback: callback !== undefined ? d => { d !== 'done' && callback(d.choices[0].delta.content) } : undefined
+      })
+
+      return response.choices[0].message.content
     }
   }
 

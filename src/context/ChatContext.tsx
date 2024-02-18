@@ -4,7 +4,7 @@ import { useAsyncEffect } from '../utils/useAsyncEffect'
 import { useAPI } from './apiContext'
 import { ArtStyle, useSettings } from './SettingsContext'
 import { handlerImage } from '../utils/constants'
-import { handlerInitialChatPrompt } from '../utils/prompts'
+import { handlerInitialChatPrompt, mandyInitialChatPrompt, quest1Prompts, quest2Prompts, translateWordPrompt } from '../utils/prompts'
 import { Language } from '../utils/languages'
 
 interface ChatContext {
@@ -16,6 +16,7 @@ interface ChatContext {
   setExtraContent: (messageIndex: number, content?: React.ReactNode) => void
   playAudio: (messageIndex: number) => Promise<void>
   translateMessage: (messageIndex: number) => Promise<void>
+  translateWord: (messageIndex: number, word: string) => Promise<void>
   clearExtraContent: (messageIndex: number) => void
 }
 
@@ -29,6 +30,7 @@ export type ChatMessage = ChatMessageRaw & {
    */
   extraContent?: React.ReactNode
   isPlayingAudio: boolean
+  finishedGenerating: boolean
 }
 
 export interface ChatData {
@@ -38,8 +40,11 @@ export interface ChatData {
 }
 
 interface Quest {
-  question: string
-  answer: string
+  nativeQuestion: string
+  nativeAnswer: string
+  foreignQuestion: string
+  foreignAnswer: string
+  complete: boolean
 }
 
 interface ChatAgent {
@@ -80,7 +85,7 @@ interface ChatInfoProviderProps {
 export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
   const api = useAPI()
   const streamQueueRef = useRef<{ messageIndex: number, queue: string[], done: () => void, calledDone: boolean }>({ messageIndex: 0, queue: [], done: () => {}, calledDone: false })
-  const { artStyle, autoPlayAudio, level, nativeLanguage } = useSettings()
+  const { artStyle, autoPlayAudio, level, nativeLanguage, foreignLanguage } = useSettings()
   const [chats, setChats] = useState<ChatContext['chats']>(createInitialChats())
 
   useEffect(() => {
@@ -104,6 +109,71 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
     }
   }, [])
 
+  useAsyncEffect(async () => {
+    if (nativeLanguage !== undefined && foreignLanguage !== undefined) {
+      setChats(chats => {
+        const newChats = [...chats]
+        const nativeQuest1 = quest1Prompts(nativeLanguage)
+        const foreignQuest1 = quest1Prompts(foreignLanguage)
+        newChats[1].quests = [{
+          nativeQuestion: nativeQuest1[0].question,
+          nativeAnswer: nativeQuest1[0].answer,
+          foreignQuestion: foreignQuest1[0].question,
+          foreignAnswer: foreignQuest1[0].answer,
+          complete: false
+        }, {
+          nativeQuestion: nativeQuest1[1].question,
+          nativeAnswer: nativeQuest1[1].answer,
+          foreignQuestion: foreignQuest1[1].question,
+          foreignAnswer: foreignQuest1[1].answer,
+          complete: false  
+        }, {
+          nativeQuestion: nativeQuest1[2].question,
+          nativeAnswer: nativeQuest1[2].answer,
+          foreignQuestion: foreignQuest1[2].question,
+          foreignAnswer: foreignQuest1[2].answer,
+          complete: false
+        }]
+
+        const nativeQuest2 = quest2Prompts(nativeLanguage)
+        const foreignQuest2 = quest2Prompts(foreignLanguage)
+        newChats[2].quests = [{
+          nativeQuestion: nativeQuest2[0].question,
+          nativeAnswer: nativeQuest2[0].answer,
+          foreignQuestion: foreignQuest2[0].question,
+          foreignAnswer: foreignQuest2[0].answer,
+          complete: false
+        }, {
+          nativeQuestion: nativeQuest2[1].question,
+          nativeAnswer: nativeQuest2[1].answer,
+          foreignQuestion: foreignQuest2[1].question,
+          foreignAnswer: foreignQuest2[1].answer,
+          complete: false
+        }]
+
+        const nativeQuest3 = quest2Prompts(nativeLanguage)
+        const foreignQuest3 = quest2Prompts(foreignLanguage)
+        newChats[3].quests = [{
+          nativeQuestion: nativeQuest3[0].question,
+          nativeAnswer: nativeQuest3[0].answer,
+          foreignQuestion: foreignQuest3[0].question,
+          foreignAnswer: foreignQuest3[0].answer,
+          complete: false
+        }, {
+          nativeQuestion: nativeQuest3[1].question,
+          nativeAnswer: nativeQuest3[1].answer,
+          foreignQuestion: foreignQuest3[1].question,
+          foreignAnswer: foreignQuest3[1].answer,
+          complete: false
+        }]
+
+        newChats[1].agent.initialChatPrompt = mandyInitialChatPrompt(foreignLanguage)
+
+        return newChats
+      })
+    }
+  }, [nativeLanguage, foreignLanguage])
+
   useEffect(() => {
     const interval = setInterval(() => {
       if (streamQueueRef.current.queue.length > 0) {
@@ -125,17 +195,52 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
     return () => clearInterval(interval)
   }, [level])
 
+  const checkQuests = async (agentResponse: string): Promise<void> => {
+    const quests = chats[level].quests
+    if (quests.length === 0) return
+
+    for (let i = 0; i < quests.length; i++) {
+      if (quests[i].complete) continue
+
+      const quest = quests[i]
+      const prompt = `You are a moderation model. You must say 'YES' if the user's message talks about ${quest.foreignQuestion} or a subject relating to it. You must say 'NO' if it does not. Do not say anything other than 'YES' or 'NO'.`
+
+      const response = await api.togetherAi.chat({
+        model: TogetherChatModel.Qwen_1_5_Chat_72B,
+        messages: [{ role: 'system', content: prompt }, { role: 'user', content: agentResponse }],
+        maxTokens: 10
+      })
+
+      if (response.choices[0].message.content.toLowerCase().includes('yes')) {
+        setChats(chats => {
+          const newChats = [...chats]
+          newChats[level].quests[i].complete = true
+          return newChats
+        })
+      
+      }
+    }
+  }
+
   const chatAgent = async (index: number, messages: ChatMessage[], doneCallback?: () => void): Promise<void> => {
+    let cummunitive = ''
     let audioChunk = ''
 
+    const filteredMessages = messages.slice(0, -1).map(m => ({
+      role: m.role,
+      content: m.content
+    }))
+
     await api.togetherAi.chat({
-      model: TogetherChatModel.Code_Llama_Instruct_70B,
-      messages: [{ role: 'system', content: chats[index].agent.initialChatPrompt }, ...messages.slice(0, -1)],
+      model: TogetherChatModel.Qwen_1_5_Chat_72B,
+      messages: [{ role: 'system', content: chats[index].agent.initialChatPrompt }, ...filteredMessages],
       repetitionPenalty: 1.2,
+      maxTokens: 1000,
       streamCallback: v => {
         if (v !== 'done') {
           const newContent = v.choices[0].delta.content
           audioChunk += newContent
+          cummunitive += newContent
 
           if (autoPlayAudio) {
             streamQueueRef.current.messageIndex = chats[index].messages.length - 1
@@ -160,6 +265,8 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
           if (autoPlayAudio && audioChunk.trim().length > 0) {
             api.playAudioStream(audioChunk, chats[index].agent.voiceId)
           }
+
+          checkQuests(cummunitive)
         }
       }
     })
@@ -200,18 +307,26 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
     newChats[index].messages.push({
       role: 'user',
       content,
-      isPlayingAudio: false
+      isPlayingAudio: false,
+      finishedGenerating: true
     })
 
     newChats[index].messages.push({
       role: 'assistant',
       content: '',
-      isPlayingAudio: false
+      isPlayingAudio: false,
+      finishedGenerating: false
     })
 
     setChats(newChats)
 
-    await chatAgent(index, newChats[index].messages)
+    await chatAgent(index, newChats[level].messages, () => {
+      setChats(chats => {
+        const newChats = [...chats]
+        newChats[level].messages[chats[level].messages.length - 1].finishedGenerating = true
+        return newChats
+      })
+    })
 
     // Do not await this, as it is not necessary to wait for the image to be generated
     void generateResponsiveImage(index)
@@ -221,10 +336,10 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
     const systemPrompt = 'Create a description of an image representing the latest response from the assistant. Include details about what the character is doing and the environment they are in. Describe what the character is wearing and what they are holding.'
 
     const repsonsiveImagePrompt = await api.togetherAi.chat({
-      model: TogetherChatModel.Code_Llama_Instruct_70B,
+      model: TogetherChatModel.Qwen_1_5_Chat_72B,
       messages: [
         { role: 'system', content: chatInfo.agent.initialChatPrompt },
-        ...chatInfo.messages,
+        ...chatInfo.messages.map(m => ({ role: m.role, content: m.content })),
         { role: 'system', content: systemPrompt}
       ]
     })
@@ -239,7 +354,14 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
     },
     sendMessage,
     introduce: async (index: number, doneCallback?: () => void): Promise<void> => {
-      await chatAgent(index, chats[index].messages, doneCallback)
+      await chatAgent(index, chats[index].messages, () => {
+        setChats(chats => {
+          const newChats = [...chats]
+          newChats[level].messages[chats[level].messages.length - 1].finishedGenerating = true
+          return newChats
+        })
+        doneCallback?.()
+      })
     },
     setAppendedContent: (messageIndex: number, content?: React.ReactNode) => {
       setChats(chats => {
@@ -257,27 +379,20 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
     },
     playAudio,
     translateMessage: async (messageIndex: number): Promise<void> => {
-      const prompt = `You are a translation model. You always translate the previous message into a different language. Translate the following message into ${nativeLanguage}.`
       const content = chats[level].messages[messageIndex].content
       let translatedMessage = ''
 
-      await api.togetherAi.chat({
-        model: TogetherChatModel.Code_Llama_Instruct_70B,
-        messages: [{ role: 'system', content: prompt }, { role: 'user', content }],
-        streamCallback: v => {
-          if (v === 'done') return
-          translatedMessage += v.choices[0].delta.content
-
-          setChats(chats => {
-            const newChats = [...chats]
-            newChats[level].messages[messageIndex].extraContent = (
-              <div>
-                {translatedMessage}
-              </div>
-            )
-            return newChats
-          })
-        }
+      await api.translate(content, nativeLanguage, d => {
+        translatedMessage += d
+        setChats(chats => {
+          const newChats = [...chats]
+          newChats[level].messages[messageIndex].extraContent = (
+            <div>
+              {translatedMessage}
+            </div>
+          )
+          return newChats
+        })
       })
     },
     clearExtraContent: (messageIndex: number) => {
@@ -285,6 +400,29 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
         const newChats = [...chats]
         newChats[level].messages[messageIndex].extraContent = undefined
         return newChats
+      })
+    },
+    translateWord: async (messageIndex: number, word: string): Promise<void> => {
+      const prompt = translateWordPrompt(nativeLanguage, foreignLanguage, word, chats[level].messages[messageIndex].content)
+      let translatedWord = ''
+
+      await api.togetherAi.chat({
+        model: TogetherChatModel.Qwen_1_5_Chat_72B,
+        messages: [{ role: 'system', content: prompt }],
+        streamCallback: v => {
+          if (v === 'done') return
+          translatedWord += v.choices[0].delta.content
+
+          setChats(chats => {
+            const newChats = [...chats]
+            newChats[level].messages[messageIndex].extraContent = (
+              <div>
+                {translatedWord}
+              </div>
+            )
+            return newChats
+          })
+        }
       })
     }
   }
@@ -298,17 +436,35 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
 
 const createInitialChats = (): ChatData[] => {
   return [{
-    messages: [{ role: 'assistant', content: '', isPlayingAudio: false }],
+    messages: [{ role: 'assistant', content: '', isPlayingAudio: false, finishedGenerating: false }],
     agent: createHandler(),
     quests: []
   }, {
     quests: [],
-    messages: [{ role: 'assistant', content: '', isPlayingAudio: false }],
+    messages: [{ role: 'assistant', content: '', isPlayingAudio: false, finishedGenerating: false }],
     agent: {
       name: 'Mandy',
       voiceId: 'jsCqWAovK2LkecY7zXl4',
       baseImagePrompt: 'Draw an anime girl with pink hair. The character is wearing casual clothes and a skirt.',
-      initialChatPrompt: 'Your name is Mandy. You are a young girl who likes vegetables, sports, and playing with your friends. You really like carrots, but do not like spinach. You are allergic to shellfish. Your favorite sport is basketball. Your favorite color is purple. You love animals. You are very friendly. Tell the user about your favoriate animal.',
+      initialChatPrompt: mandyInitialChatPrompt(Language.English),
+    }
+  }, {
+    quests: [],
+    messages: [{ role: 'assistant', content: '', isPlayingAudio: false, finishedGenerating: false }],
+    agent: {
+      name: 'Kai',
+      voiceId: 'IKne3meq5aSn9XLyUdCD',
+      baseImagePrompt: 'Draw an anime boy with blue hair. The character is wearing casual clothes and jeans. He has blond hair. He is very attractive. He has a small, lean frame.',
+      initialChatPrompt: 'Your name is Kai. You are a young boy who likes to play video games and read books. You really like pizza, but do not like sushi. You are allergic to peanuts. Your favorite video game is Minecraft. Your favorite color is green. You are in high school. You enjoy math but dislike history. Tell the user about your favorite book.',
+    }
+  }, {
+    quests: [],
+    messages: [{ role: 'assistant', content: '', isPlayingAudio: false, finishedGenerating: false }],
+    agent: {
+      name: 'Robert',
+      voiceId: 'IKne3meq5aSn9XLyUdCD',
+      baseImagePrompt: 'Draw an anime grandpa with a cane. The character is wearing a suit and tie. He has a beard and glasses. He is very wise and kind.',
+      initialChatPrompt: 'Your name is Robert. You are a grandpa who likes to play chess and read books. You really like apple pie. Your favorite book is "One flew over the cookoo\'s nest". You are a retired teacher. Your mom\'s name is Jane. Your dad\'s name is John. Tell the user about what you did for a living.'
     }
   }]
 }

@@ -75,10 +75,20 @@
   flex-direction: row;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 2px;
+  gap: 10px;
+  color: #909090;
 }
 
 .chatBubbleExtraClose {
   cursor: pointer;
   margin-top: 5px;
+}
+
+.chatBubbleSegment {
+  cursor: pointer;
+}
+
+.chatBubbleSegment:hover {
+  color: #ffffff;
+  background-color: #1f1f25;
 }

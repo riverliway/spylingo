@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import './ChatBubble.css'
 import { ChatMessage } from '../../context/ChatContext'
 import { CloseOutlined, SoundOutlined, TranslationOutlined } from '@ant-design/icons'
@@ -10,10 +10,19 @@ interface ChatBubbleProps {
   isPlayingAudio: boolean
   playAudio: () => void
   translateWholeMessage: () => void
+  translateWord: (word: string) => void
   clearExtraContent: () => void
 }
 
 export const ChatBubble: React.FC<ChatBubbleProps> = props => {
+  const [segments, setSegments] = useState<string[]>([])
+
+  useEffect(() => {
+    if (props.message?.finishedGenerating && props.message.role === 'assistant') {
+      setSegments(props.message?.content.split(' '))
+    }
+  }, [props.message?.finishedGenerating])
+
   if (props.message?.role === 'system') {
     return <></>
   }
@@ -54,7 +63,11 @@ export const ChatBubble: React.FC<ChatBubbleProps> = props => {
       {props.message !== undefined && (
         <div className={`chatBubble ${bubbleClassName}`}>
           <div className='chatBubbleContents'>
-            <div>{props.message?.content}</div>
+            <div>
+              {segments.length === 0 ? props.message?.content : segments.map((segment, i) => (
+                <span key={i} className='chatBubbleSegment' onClick={() => props.translateWord(segment)}>{segment} </span>
+              ))}
+            </div>
             {props.message?.appendContent !== undefined && props.message.appendContent}
           </div>
           {props.message?.extraContent !== undefined && (

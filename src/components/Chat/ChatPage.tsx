@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { Input, Spin } from 'antd'
-import { LogoutOutlined, SendOutlined, SettingOutlined } from '@ant-design/icons'
+import { CheckCircleFilled, LogoutOutlined, SendOutlined, SettingOutlined, StopOutlined } from '@ant-design/icons'
 
 import { ChatData, useChatInfo } from '../../context/ChatContext'
 import './ChatPage.css'
 import { ChatBubble } from './ChatBubble'
-import { exitPrompt, settingsPrompt, typeMessagePrompt } from '../../utils/prompts'
+import { exitPrompt, objectivePrompt, settingsPrompt, typeMessagePrompt } from '../../utils/prompts'
 import { useSettings } from '../../context/SettingsContext'
 import { SettingsModal } from '../SettingsModal/SettingsModal'
 
@@ -46,6 +46,7 @@ export const ChatPage: React.FC<ChatData & { index: number }> = props => {
             playAudio={() => chatData.playAudio(0)}
             translateWholeMessage={() => chatData.translateMessage(0)}
             clearExtraContent={() => {}}
+            translateWord={word => chatData.translateWord(0, word)}
           />
           {props.messages.map((message, index) => (
             <ChatBubble
@@ -57,6 +58,7 @@ export const ChatPage: React.FC<ChatData & { index: number }> = props => {
               playAudio={() => chatData.playAudio(index + 1)}
               translateWholeMessage={() => chatData.translateMessage(index + 1)}
               clearExtraContent={() => chatData.clearExtraContent(index)}
+              translateWord={word => chatData.translateWord(index, word)}
             />
           ))}
         </div>
@@ -78,7 +80,17 @@ export const ChatPage: React.FC<ChatData & { index: number }> = props => {
       </div>
       {props.index !== 0 && (
         <div className='chatQuestBar'>
-          <div>quest items</div>
+          <div className='chatQuestContain'>
+            <div className='chatQuestTitle'>{objectivePrompt(nativeLanguage)}</div>
+            <div className='chatQuests'>
+              {props.quests.map((quest, i) => (
+                <div key={i} className='chatQuestItem'>
+                  <div className='chatQuestIcon'>{quest.complete ? <CheckCircleFilled /> : <StopOutlined />}</div>
+                  <div>{quest.nativeQuestion}</div>
+                </div>
+              ))}
+            </div>
+          </div>
           <div className='chatQuestMenu'>
             <div className='chatQuestMenuItem' onClick={() => setSettingsOpen(true)}>
               <SettingOutlined />

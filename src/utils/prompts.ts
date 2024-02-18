@@ -442,6 +442,210 @@ export const settingsAutoPlayAudioPrompt = (lang: Language): string => {
   }
 }
 
+export const objectivePrompt = (lang: Language): string => {
+  switch (lang) {
+    case Language.English: return 'Objectives'
+    case Language.Spanish: return 'Objetivos'
+    case Language.Portuguese: return 'Objetivos'
+    case Language.French: return 'Objectifs'
+    case Language.German: return 'Ziele'
+    case Language.Polish: return 'Cele'
+    case Language.Italian: return 'Obiettivi'
+    case Language.Japanese: return '目標'
+    case Language.Chinese: return '目标'
+    case Language.Korean: return '목표'
+    case Language.Dutch: return 'Doelstellingen'
+    case Language.Turkish: return 'Hedefler'
+    case Language.Swedish: return 'Mål'
+    case Language.Indonesian: return 'Tujuan'
+    case Language.Filipino: return 'Mga Layunin'
+    case Language.Ukrainian: return 'Мети'
+    case Language.Greek: return 'Στόχοι'
+    case Language.Czech: return 'Cíle'
+    case Language.Finnish: return 'Tavoitteet'
+    case Language.Romanian: return 'Obiective'
+    case Language.Russian: return 'Цели'
+    case Language.Danish: return 'Mål'
+    case Language.Bulgarian: return 'Цели'
+    case Language.Malay: return 'Matlamat'
+    case Language.Slovak: return 'Ciele'
+    case Language.Croatian: return 'Ciljevi'
+    case Language.Arabic: return 'أهداف'
+    case Language.Tamil: return 'இலக்குகள்'
+    case Language.Hindi: return 'लक्ष्य'
+  }
+}
+
+export const translateSentencePrompt = (nativeLang: Language): string => {
+  switch (nativeLang) {
+    case Language.English: return `You are a translation model. You always translate the previous message into a different language. Translate the following message into ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Spanish: return `Eres un modelo de traducción. Siempre traduces el mensaje anterior a un idioma diferente. Traduce el siguiente mensaje al ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Portuguese: return `Você é um modelo de tradução. Você sempre traduz a mensagem anterior para um idioma diferente. Traduza a seguinte mensagem para o ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.French: return `Vous êtes un modèle de traduction. Vous traduisez toujours le message précédent dans une langue différente. Traduisez le message suivant en ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.German: return `Sie sind ein Übersetzungsmodell. Sie übersetzen immer die vorherige Nachricht in eine andere Sprache. Übersetzen Sie die folgende Nachricht in ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Polish: return `Jesteś modelem tłumaczenia. Zawsze tłumaczysz poprzednią wiadomość na inny język. Przetłumacz następną wiadomość na ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Italian: return `Sei un modello di traduzione. Traduci sempre il messaggio precedente in una lingua diversa. Traduci il seguente messaggio in ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Japanese: return `あなたは翻訳モデルです。常に前のメッセージを異なる言語に翻訳します。次のメッセージを${getLanguageName(nativeLang, nativeLang)}に翻訳してください。`
+    case Language.Chinese: return `您是一个翻译模型。您总是将上一条消息翻译成不同的语言。将以下消息翻译成${getLanguageName(nativeLang, nativeLang)}。`
+    case Language.Korean: return `당신은 번역 모델입니다. 항상 이전 메시지를 다른 언어로 번역합니다. 다음 메시지를 ${getLanguageName(nativeLang, nativeLang)}로 번역하십시오.`
+    case Language.Dutch: return `Je bent een vertaalmodel. Je vertaalt altijd het vorige bericht naar een andere taal. Vertaal het volgende bericht naar ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Turkish: return `Bir çeviri modelisiniz. Her zaman önceki mesajı farklı bir dile çevirirsiniz. Aşağıdaki mesajı ${getLanguageName(nativeLang, nativeLang)} diline çevirin.`
+    case Language.Swedish: return `Du är en översättningsmodell. Du översätter alltid det tidigare meddelandet till ett annat språk. Översätt följande meddelande till ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Indonesian: return `Anda adalah model terjemahan. Anda selalu menerjemahkan pesan sebelumnya ke bahasa lain. Terjemahkan pesan berikut ke ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Filipino: return `Ikaw ay isang modelo ng pagsasalin. Lagi mong isinalin ang naunang mensahe sa ibang wika. Isalin ang sumusunod na mensahe sa ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Ukrainian: return `Ви - модель перекладу. Ви завжди перекладаєте попереднє повідомлення на іншу мову. Перекладіть наступне повідомлення на ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Greek: return `Είστε ένα μοντέλο μετάφρασης. Μεταφράζετε πάντα το προηγούμενο μήνυμα σε διαφορετική γλώσσα. Μεταφράστε το ακόλουθο μήνυμα σε ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Czech: return `Jste překladový model. Vždy překládáte předchozí zprávu do jiného jazyka. Přeložte následující zprávu do ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Finnish: return `Olet käännösmalli. Käännät aina edellisen viestin eri kielelle. Käännä seuraava viesti ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Romanian: return `Ești un model de traducere. Traduci întotdeauna mesajul anterior într-o altă limbă. Tradu mesajul următor în ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Russian: return `Вы - модель перевода. Вы всегда переводите предыдущее сообщение на другой язык. Переведите следующее сообщение на ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Danish: return `Du er en oversættelsesmodel. Du oversætter altid den tidligere besked til et andet sprog. Oversæt følgende besked til ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Bulgarian: return `Вие сте модел за превод. Винаги превеждате предишното съобщение на различен език. Преведете следното съобщение на ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Malay: return `Anda adalah model terjemahan. Anda sentiasa menterjemahkan mesej sebelumnya ke bahasa lain. Terjemahkan mesej berikut ke ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Slovak: return `Ste prekladový model. Vždy prekladáte predchádzajúcu správu do iného jazyka. Preložte nasledujúcu správu do ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Croatian: return `Vi ste model prijevoda. Uvijek prevodite prethodnu poruku na drugi jezik. Prevedite sljedeću poruku na ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Arabic: return `أنت نموذج ترجمة. تترجم دائمًا الرسالة السابقة إلى لغة مختلفة. قم بترجمة الرسالة التالية إلى ${getLanguageName(nativeLang, nativeLang)}.`
+    case Language.Tamil: return `நீங்கள் ஒரு மொழிபெயர்ப்பு மாதிரி. நீங்கள் எப்போதும் முந்தைய செய்தியை வேறு மொழிக்கு மொழிபெயரிக்கிறீர்கள். பின்னர் உள்ள செய்தியை ${getLanguageName(nativeLang, nativeLang)} மொழிக்கு மொழிபெயரிக்கவும்.`
+    case Language.Hindi: return `आप एक अनुवाद मॉडल हैं। आप हमेशा पिछले संदेश को एक अलग भाषा में अनुवादित करते हैं। निम्नलिखित संदेश को ${getLanguageName(nativeLang, nativeLang)} में अनुवादित करें।`
+  }
+}
+
+export const translateWordPrompt = (nativeLang: Language, foreignLang: Language, word: string, message: string): string => {
+  switch (nativeLang) {
+    case Language.English: return `Translate the following word from ${getLanguageName(foreignLang, nativeLang)}: "${word}". This word appears in the following message: "${message}". Do not repeat that message. Provide the description of the word in ${getLanguageName(nativeLang, nativeLang)}. You may also provide a new example sentence in ${getLanguageName(foreignLang, nativeLang)} using the word.`
+    case Language.Spanish: return `Traduce la siguiente palabra de ${getLanguageName(foreignLang, nativeLang)}: "${word}". Esta palabra aparece en el siguiente mensaje: "${message}". No repitas ese mensaje. Proporcione la descripción de la palabra en ${getLanguageName(nativeLang, nativeLang)}. También puede proporcionar una nueva oración de ejemplo en ${getLanguageName(foreignLang, nativeLang)} usando la palabra.`
+    case Language.Portuguese: return `Traduza a seguinte palavra de ${getLanguageName(foreignLang, nativeLang)}: "${word}". Esta palavra aparece na seguinte mensagem: "${message}". Não repita essa mensagem. Forneça a descrição da palavra em ${getLanguageName(nativeLang, nativeLang)}. Você também pode fornecer uma nova frase de exemplo em ${getLanguageName(foreignLang, nativeLang)} usando a palavra.`
+    case Language.French: return `Traduisez le mot suivant de ${getLanguageName(foreignLang, nativeLang)}: "${word}". Ce mot apparaît dans le message suivant: "${message}". Ne répétez pas ce message. Fournissez la description du mot en ${getLanguageName(nativeLang, nativeLang)}. Vous pouvez également fournir une nouvelle phrase d'exemple en ${getLanguageName(foreignLang, nativeLang)} utilisant le mot.`
+    case Language.German: return `Übersetze das folgende Wort aus ${getLanguageName(foreignLang, nativeLang)}: "${word}". Dieses Wort erscheint in der folgenden Nachricht: "${message}". Wiederholen Sie diese Nachricht nicht. Geben Sie die Beschreibung des Wortes in ${getLanguageName(nativeLang, nativeLang)} an. Sie können auch einen neuen Beispielsatz in ${getLanguageName(foreignLang, nativeLang)} mit dem Wort angeben.`
+    case Language.Polish: return `Przetłumacz następujące słowo z ${getLanguageName(foreignLang, nativeLang)}: "${word}". To słowo pojawia się w następującej wiadomości: "${message}". Nie powtarzaj tej wiadomości. Podaj opis słowa w ${getLanguageName(nativeLang, nativeLang)}. Możesz również podać nowe zdanie przykładowe w ${getLanguageName(foreignLang, nativeLang)} z użyciem tego słowa.`
+    case Language.Italian: return `Traduci la parola seguente da ${getLanguageName(foreignLang, nativeLang)}: "${word}". Questa parola appare nel seguente messaggio: "${message}". Non ripetere questo messaggio. Fornisci la descrizione della parola in ${getLanguageName(nativeLang, nativeLang)}. Puoi anche fornire una nuova frase di esempio in ${getLanguageName(foreignLang, nativeLang)} usando la parola.`
+    case Language.Japanese: return `次の単語を${getLanguageName(foreignLang, nativeLang)}から翻訳してください: "${word}"。この単語は次のメッセージに表示されます: "${message}"。このメッセージを繰り返さないでください。${getLanguageName(nativeLang, nativeLang)}で単語の説明を提供してください。また、その単語を使った${getLanguageName(foreignLang, nativeLang)}の新しい例文を提供することもできます。`
+    case Language.Chinese: return `请将以下单词从${getLanguageName(foreignLang, nativeLang)}翻译为英语: "${word}"。这个词出现在以下消息中: "${message}"。不要重复这条消息。提供${getLanguageName(nativeLang, nativeLang)}中该词的描述。您还可以提供一个新的例句，使用该词在${getLanguageName(foreignLang, nativeLang)}中。`
+    case Language.Korean: return `다음 단어를 ${getLanguageName(foreignLang, nativeLang)}에서 번역하십시오: "${word}". 이 단어는 다음 메시지에 나타납니다: "${message}". 이 메시지를 반복하지 마십시오. ${getLanguageName(nativeLang, nativeLang)}에서 단어의 설명을 제공하십시오. 또한 해당 단어를 사용한 ${getLanguageName(foreignLang, nativeLang)}의 새로운 예문을 제공할 수 있습니다.`
+    case Language.Dutch: return `Vertaal het volgende woord uit ${getLanguageName(foreignLang, nativeLang)}: "${word}". Dit woord komt voor in het volgende bericht: "${message}". Herhaal dat bericht niet. Geef de beschrijving van het woord in ${getLanguageName(nativeLang, nativeLang)}. U kunt ook een nieuwe voorbeeldzin in ${getLanguageName(foreignLang, nativeLang)} met het woord geven.`
+    case Language.Turkish: return `Aşağıdaki kelimeyi ${getLanguageName(foreignLang, nativeLang)}'den çevirin: "${word}". Bu kelime aşağıdaki mesajda görünüyor: "${message}". Bu mesajı tekrar etmeyin. Kelimenin tanımını ${getLanguageName(nativeLang, nativeLang)} olarak verin. Ayrıca kelimeyi kullanarak ${getLanguageName(foreignLang, nativeLang)} için yeni bir örnek cümle de verebilirsiniz.`
+    case Language.Swedish: return `Översätt följande ord från ${getLanguageName(foreignLang, nativeLang)}: "${word}". Detta ord förekommer i följande meddelande: "${message}". Upprepa inte det meddelandet. Ange ordets beskrivning på ${getLanguageName(nativeLang, nativeLang)}. Du kan också ge en ny exempelsats på ${getLanguageName(foreignLang, nativeLang)} med ordet.`
+    case Language.Indonesian: return `Terjemahkan kata berikut dari ${getLanguageName(foreignLang, nativeLang)}: "${word}". Kata ini muncul dalam pesan berikut: "${message}". Jangan ulangi pesan tersebut. Berikan deskripsi kata dalam ${getLanguageName(nativeLang, nativeLang)}. Anda juga dapat memberikan contoh kalimat baru dalam ${getLanguageName(foreignLang, nativeLang)} menggunakan kata tersebut.`
+    case Language.Filipino: return `Isalin ang sumusunod na salita mula sa ${getLanguageName(foreignLang, nativeLang)}: "${word}". Ang salitang ito ay lumilitaw sa sumusunod na mensahe: "${message}". Huwag ulitin ang mensaheng iyon. Magbigay ng deskripsyon ng salita sa ${getLanguageName(nativeLang, nativeLang)}. Maaari ka ring magbigay ng bagong halimbawa ng pangungusap sa ${getLanguageName(foreignLang, nativeLang)} gamit ang salita.`
+    case Language.Ukrainian: return `Перекладіть наступне слово з ${getLanguageName(foreignLang, nativeLang)}: "${word}". Це слово з'являється в наступному повідомленні: "${message}". Не повторюйте це повідомлення. Надайте опис слова в ${getLanguageName(nativeLang, nativeLang)}. Ви також можете надати нове речення-приклад у ${getLanguageName(foreignLang, nativeLang)} з використанням цього слова.`
+    case Language.Greek: return `Μεταφράστε την ακόλουθη λέξη από τα ${getLanguageName(foreignLang, nativeLang)}: "${word}". Αυτή η λέξη εμφανίζεται στο ακόλουθο μήνυμα: "${message}". Μην επαναλάβετε αυτό το μήνυμα. Δώστε την περιγραφή της λέξης στα ${getLanguageName(nativeLang, nativeLang)}. Μπορείτε επίσης να δώσετε ένα νέο παράδειγμα πρότασης στα ${getLanguageName(foreignLang, nativeLang)} χρησιμοποιώντας τη λέξη.`
+    case Language.Czech: return `Přeložte následující slovo z ${getLanguageName(foreignLang, nativeLang)}: "${word}". Toto slovo se objevuje v následující zprávě: "${message}". Neopakujte tuto zprávu. Poskytněte popis slova v ${getLanguageName(nativeLang, nativeLang)}. Můžete také poskytnout novou ukázkovou větu v ${getLanguageName(foreignLang, nativeLang)} s použitím slova.`
+    case Language.Finnish: return `Käännä seuraava sana ${getLanguageName(foreignLang, nativeLang)}: "${word}". Tämä sana esiintyy seuraavassa viestissä: "${message}". Älä toista tätä viestiä. Anna sanan kuvaus ${getLanguageName(nativeLang, nativeLang)}. Voit myös antaa uuden esimerkkilauseen ${getLanguageName(foreignLang, nativeLang)} käyttäen sanaa.`
+    case Language.Romanian: return `Traduceți următoarea cuvânt din ${getLanguageName(foreignLang, nativeLang)}: "${word}". Acest cuvânt apare în următorul mesaj: "${message}". Nu repetați acel mesaj. Furnizați descrierea cuvântului în ${getLanguageName(nativeLang, nativeLang)}. De asemenea, puteți furniza o nouă propoziție exemplu în ${getLanguageName(foreignLang, nativeLang)} folosind cuvântul.`
+    case Language.Russian: return `Переведите следующее слово из ${getLanguageName(foreignLang, nativeLang)}: "${word}". Это слово появляется в следующем сообщении: "${message}". Не повторяйте это сообщение. Предоставьте описание слова на ${getLanguageName(nativeLang, nativeLang)}. Вы также можете предоставить новое примерное предложение на ${getLanguageName(foreignLang, nativeLang)} с использованием этого слова.`
+    case Language.Danish: return `Oversæt følgende ord fra ${getLanguageName(foreignLang, nativeLang)}: "${word}". Dette ord vises i følgende besked: "${message}". Gentag ikke denne besked. Giv beskrivelsen af ordet på ${getLanguageName(nativeLang, nativeLang)}. Du kan også give en ny eksempelsætning på ${getLanguageName(foreignLang, nativeLang)} med ordet.`
+    case Language.Bulgarian: return `Преведете следната дума от ${getLanguageName(foreignLang, nativeLang)}: "${word}". Тази дума се появява в следното съобщение: "${message}". Не повтаряйте това съобщение. Предоставете описанието на думата на ${getLanguageName(nativeLang, nativeLang)}. Можете също да предоставите ново примерно изречение на ${getLanguageName(foreignLang, nativeLang)} с използването на думата.`
+    case Language.Malay: return `Terjemahkan perkataan berikut dari ${getLanguageName(foreignLang, nativeLang)}: "${word}". Kata ini muncul dalam mesej berikut: "${message}". Jangan ulangi mesej tersebut. Berikan deskripsi perkataan dalam ${getLanguageName(nativeLang, nativeLang)}. Anda juga boleh memberikan contoh ayat baru dalam ${getLanguageName(foreignLang, nativeLang)} menggunakan perkataan tersebut.`
+    case Language.Slovak: return `Preložte nasledujúce slovo z ${getLanguageName(foreignLang, nativeLang)}: "${word}". Toto slovo sa objavuje v nasledujúcom oznámení: "${message}". Neopakujte toto oznámenie. Poskytnite popis slova v ${getLanguageName(nativeLang, nativeLang)}. Môžete tiež poskytnúť novú ukážkovú vetu v ${getLanguageName(foreignLang, nativeLang)} s použitím slova.`
+    case Language.Croatian: return `Prevedite sljedeću riječ iz ${getLanguageName(foreignLang, nativeLang)}: "${word}". Ova riječ se pojavljuje u sljedećoj poruci: "${message}". Nemojte ponavljati tu poruku. Navedite opis riječi na ${getLanguageName(nativeLang, nativeLang)}. Također možete pružiti novu primjerenu rečenicu na ${getLanguageName(foreignLang, nativeLang)} koristeći riječ.`
+    case Language.Arabic: return `قم بترجمة الكلمة التالية من ${getLanguageName(foreignLang, nativeLang)}: "${word}". تظهر هذه الكلمة في الرسالة التالية: "${message}". لا تكرر تلك الرسالة. قدم وصف الكلمة في ${getLanguageName(nativeLang, nativeLang)}. يمكنك أيضًا تقديم جملة مثالية جديدة في ${getLanguageName(foreignLang, nativeLang)} باستخدام الكلمة.`
+    case Language.Tamil: return `பின்னர் உள்ள சொற்யை ${getLanguageName(foreignLang, nativeLang)} இலிருந்து மொழிபெயர்க்கவும்: "${word}". இந்த சொற்கள் பின்னர் உள்ள செய்தியில் காணப்படுகின்றது: "${message}". அந்த செய்தியை மீண்டும் சொல்ல வேண்டாம். ${getLanguageName(nativeLang, nativeLang)} இல் சொற்யின் விளக்கத்தை வழங்கவும். அந்த சொற்யை பயன்படுத்தி ${getLanguageName(foreignLang, nativeLang)} இல் புதிய உதாரண வாக்கியம் கொடுக்கலாம்.`
+    case Language.Hindi: return `निम्नलिखित शब्द को ${getLanguageName(foreignLang, nativeLang)} से अनुवादित करें: "${word}". यह शब्द निम्नलिखित संदेश में प्रकट होता है: "${message}". उस संदेश को दोहराना नहीं। ${getLanguageName(nativeLang, nativeLang)} में शब्द का विवरण प्रदान करें। आप इस शब्द का उपयोग करके ${getLanguageName(foreignLang, nativeLang)} में एक नया उदाहरण वाक्य भी प्रदान कर सकते हैं।`
+  }
+}
+
+export const quest1Prompts = (lang: Language): { question: string, answer: string }[] => {
+  switch (lang) {
+    case Language.English: return [{ question: 'Favorite food', answer: 'carrot' }, { question: 'Least favorite food', answer: 'spinach' }, { question: 'Food allergy', answer: 'shellfish' }]
+    case Language.Spanish: return [{ question: 'Comida favorita', answer: 'zanahoria' }, { question: 'Comida menos favorita', answer: 'espinacas' }, { question: 'Alergia alimentaria', answer: 'mariscos' }]
+    case Language.Portuguese: return [{ question: 'Comida favorita', answer: 'cenoura' }, { question: 'Comida menos favorita', answer: 'espinafre' }, { question: 'Alergia alimentar', answer: 'frutos do mar' }]
+    case Language.French: return [{ question: 'Nourriture préférée', answer: 'carotte' }, { question: 'Nourriture la moins préférée', answer: 'épinards' }, { question: 'Allergie alimentaire', answer: 'fruits de mer' }]
+    case Language.German: return [{ question: 'Lieblingsessen', answer: 'Karotte' }, { question: 'Am wenigsten bevorzugtes Essen', answer: 'Spinat' }, { question: 'Lebensmittelallergie', answer: 'Meeresfrüchte' }]
+    case Language.Polish: return [{ question: 'Ulubione jedzenie', answer: 'marchew' }, { question: 'Najmniej ulubione jedzenie', answer: 'szpinak' }, { question: 'Alergia pokarmowa', answer: 'owoce morza' }]
+    case Language.Italian: return [{ question: 'Cibo preferito', answer: 'carota' }, { question: 'Cibo meno preferito', answer: 'spinaci' }, { question: 'Allergia alimentare', answer: 'frutti di mare' }]
+    case Language.Japanese: return [{ question: '好きな食べ物', answer: 'にんじん' }, { question: '好きでない食べ物', answer: 'ほうれん草' }, { question: '食物アレルギー', answer: 'シーフード' }]
+    case Language.Chinese: return [{ question: '最喜欢的食物', answer: '胡萝卜' }, { question: '最不喜欢的食物', answer: '菠菜' }, { question: '食物过敏', answer: '海鲜' }]
+    case Language.Korean: return [{ question: '좋아하는 음식', answer: '당근' }, { question: '가장 싫어하는 음식', answer: '시금치' }, { question: '식품 알레르기', answer: '해산물' }]
+    case Language.Dutch: return [{ question: 'Favoriete eten', answer: 'wortel' }, { question: 'Minst favoriete eten', answer: 'spinazie' }, { question: 'Voedselallergie', answer: 'zeevruchten' }]
+    case Language.Turkish: return [{ question: 'En sevdiğiniz yemek', answer: 'havuç' }, { question: 'En az sevdiğiniz yemek', answer: 'ıspanak' }, { question: 'Yiyecek alerjisi', answer: 'deniz ürünleri' }]
+    case Language.Swedish: return [{ question: 'Favoritmat', answer: 'morot' }, { question: 'Minst favoritmat', answer: 'spenat' }, { question: 'Matallergi', answer: 'skaldjur' }]
+    case Language.Indonesian: return [{ question: 'Makanan favorit', answer: 'wortel' }, { question: 'Makanan paling tidak disukai', answer: 'bayam' }, { question: 'Alergi makanan', answer: 'seafood' }]
+    case Language.Filipino: return [{ question: 'Paboritong pagkain', answer: 'carrot' }, { question: 'Pinakakaunting paboritong pagkain', answer: 'spinach' }, { question: 'Alerhiya sa pagkain', answer: 'shellfish' }]
+    case Language.Ukrainian: return [{ question: 'Улюблена їжа', answer: 'морква' }, { question: 'Найменш улюблена їжа', answer: 'шпинат' }, { question: 'Їжа алергія', answer: 'морепродукти' }]
+    case Language.Greek: return [{ question: 'Αγαπημένο φαγητό', answer: 'καρότο' }, { question: 'Λιγότερο αγαπημένο φαγητό', answer: 'σπανάκι' }, { question: 'Αλλεργία στο φαγητό', answer: 'θαλασσινά'}]
+    case Language.Czech: return [{ question: 'Oblíbené jídlo', answer: 'mrkev' }, { question: 'Nejméně oblíbené jídlo', answer: 'špenát' }, { question: 'Potravinová alergie', answer: 'mořské plody' }]
+    case Language.Finnish: return [{ question: 'Lempi ruoka', answer: 'porkkana' }, { question: 'Vähiten pidetty ruoka', answer: 'pinaatti' }, { question: 'Ruoka-aineallergia', answer: 'äyriäiset' }]
+    case Language.Romanian: return [{ question: 'Mâncare preferată', answer: 'morcov' }, { question: 'Mâncare mai puțin preferată', answer: 'spanac' }, { question: 'Alergie alimentară', answer: 'fructe de mare' }]
+    case Language.Russian: return [{ question: 'Любимая еда', answer: 'морковь' }, { question: 'Наименее любимая еда', answer: 'шпинат' }, { question: 'Пищевая аллергия', answer: 'морепродукты' }]
+    case Language.Danish: return [{ question: 'Yndlingsmad', answer: 'gulerod' }, { question: 'Mindst favoritmad', answer: 'spinat' }, { question: 'Madallergi', answer: 'skaldyr' }]
+    case Language.Bulgarian: return [{ question: 'Любима храна', answer: 'морков' }, { question: 'Най-малко харесвана храна', answer: 'спанак' }, { question: 'Хранителна алергия', answer: 'морски дарове' }]
+    case Language.Malay: return [{ question: 'Makanan kegemaran', answer: 'lobak' }, { question: 'Makanan yang paling tidak disukai', answer: 'bayam' }, { question: 'Alergi makanan', answer: 'makanan laut' }]
+    case Language.Slovak: return [{ question: 'Obľúbené jedlo', answer: 'mrkva' }, { question: 'Najmenej obľúbené jedlo', answer: 'špenát' }, { question: 'Alergia na potraviny', answer: 'morské plody' }]
+    case Language.Croatian: return [{ question: 'Omiljena hrana', answer: 'mrkva' }, { question: 'Najmanje omiljena hrana', answer: 'špinat' }, { question: 'Alergija na hranu', answer: 'plodovi mora' }]
+    case Language.Arabic: return [{ question: 'الطعام المفضل', answer: 'جزر' }, { question: 'الطعام الأقل مفضل', answer: 'سبانخ' }, { question: 'حساسية الطعام', answer: 'مأكولات بحرية' }]
+    case Language.Tamil: return [{ question: 'பிரியமான உணவு', answer: 'கேரட்' }, { question: 'அருகில் இல்லாத உணவு', answer: 'கீரை' }, { question: 'உணவு எல்லையம்', answer: 'கடல் உணவு' }]
+    case Language.Hindi: return [{ question: 'पसंदीदा खाना', answer: 'गाजर' }, { question: 'कम पसंदीदा खाना', answer: 'पालक' }, { question: 'खाने की एलर्जी', answer: 'सीफूड' }]
+  }
+}
+
+export const quest2Prompts = (lang: Language): { question: string, answer: string }[] => {
+  switch (lang) {
+    case Language.English: return [{ question: 'Favorite school subject', answer: 'math' }, { question: 'Least favorite school subject', answer: 'history' }]
+    case Language.Spanish: return [{ question: 'Materia escolar favorita', answer: 'matemáticas' }, { question: 'Materia escolar menos favorita', answer: 'historia' }]
+    case Language.Portuguese: return [{ question: 'Matéria escolar favorita', answer: 'matemática' }, { question: 'Matéria escolar menos favorita', answer: 'história' }]
+    case Language.French: return [{ question: 'Matière scolaire préférée', answer: 'mathématiques' }, { question: 'Matière scolaire la moins préférée', answer: 'histoire' }]
+    case Language.German: return [{ question: 'Lieblingsfach', answer: 'Mathematik' }, { question: 'Am wenigsten bevorzugtes Fach', answer: 'Geschichte' }]
+    case Language.Polish: return [{ question: 'Ulubiony przedmiot szkolny', answer: 'matematyka' }, { question: 'Najmniej ulubiony przedmiot szkolny', answer: 'historia' }]
+    case Language.Italian: return [{ question: 'Materia scolastica preferita', answer: 'matematica' }, { question: 'Materia scolastica meno preferita', answer: 'storia' }]
+    case Language.Japanese: return [{ question: '好きな学校の科目', answer: '数学' }, { question: '最も好きでない学校の科目', answer: '歴史' }]
+    case Language.Chinese: return [{ question: '最喜欢的学科', answer: '数学' }, { question: '最不喜欢的学科', answer: '历史' }]
+    case Language.Korean: return [{ question: '좋아하는 학교 과목', answer: '수학' }, { question: '가장 싫어하는 학교 과목', answer: '역사' }]
+    case Language.Dutch: return [{ question: 'Favoriete schoolvak', answer: 'wiskunde' }, { question: 'Minst favoriete schoolvak', answer: 'geschiedenis' }]
+    case Language.Turkish: return [{ question: 'En sevilen okul dersi', answer: 'matematik' }, { question: 'En az sevilen okul dersi', answer: 'tarih' }]
+    case Language.Swedish: return [{ question: 'Favoritämne i skolan', answer: 'matematik' }, { question: 'Minst favoritämne i skolan', answer: 'historia' }]
+    case Language.Indonesian: return [{ question: 'Mata pelajaran sekolah favorit', answer: 'matematika' }, { question: 'Mata pelajaran sekolah paling tidak disukai', answer: 'sejarah' }]
+    case Language.Filipino: return [{ question: 'Paboritonh asignatura sa paaralan', answer: 'matematika' }, { question: 'Pinakakaunting paboritong asignatura sa paaralan', answer: 'kasaysayan' }]
+    case Language.Ukrainian: return [{ question: 'Улюблений шкільний предмет', answer: 'математика' }, { question: 'Найменш улюблений шкільний предмет', answer: 'історія' }]
+    case Language.Greek: return [{ question: 'Αγαπημένο μάθημα στο σχολείο', answer: 'μαθηματικά' }, { question: 'Λιγότερο αγαπητό μάθημα στο σχολείο', answer: 'ιστορία' }]
+    case Language.Czech: return [{ question: 'Oblíbený školní předmět', answer: 'matematika' }, { question: 'Nejméně oblíbený školní předmět', answer: 'dějepis' }]
+    case Language.Finnish: return [{ question: 'Suosikkikouluaine', answer: 'matematiikka' }, { question: 'Vähiten pidetty kouluaine', answer: 'historia' }]
+    case Language.Romanian: return [{ question: 'Materie preferată la școală', answer: 'matematică' }, { question: 'Materie mai puțin preferată la școală', answer: 'istorie' }]
+    case Language.Russian: return [{ question: 'Любимый школьный предмет', answer: 'математика' }, { question: 'Наименее любимый школьный предмет', answer: 'история' }]
+    case Language.Danish: return [{ question: 'Favorit skolefag', answer: 'matematik' }, { question: 'Mindst favorit skolefag', answer: 'historie' }]
+    case Language.Bulgarian: return [{ question: 'Любим учебен предмет', answer: 'математика' }, { question: 'Най-малко харесван учебен предмет', answer: 'история' }]
+    case Language.Malay: return [{ question: 'Subjek sekolah kegemaran', answer: 'matematik' }, { question: 'Subjek sekolah paling tidak disukai', answer: 'sejarah' }]
+    case Language.Slovak: return [{ question: 'Obľúbený školský predmet', answer: 'matematika' }, { question: 'Najmenej obľúbený školský predmet', answer: 'história' }]
+    case Language.Croatian: return [{ question: 'Omiljeni školski predmet', answer: 'matematika' }, { question: 'Najmanje omiljeni školski predmet', answer: 'povijest' }]
+    case Language.Arabic: return [{ question: 'المادة المدرسية المفضلة', answer: 'رياضيات' }, { question: 'المادة المدرسية الأقل مفضلة', answer: 'تاريخ' }]
+    case Language.Tamil: return [{ question: 'பிரியமான பள்ளி பாடம்', answer: 'கணிதம்' }, { question: 'அருகில் இல்லாத பள்ளி பாடம்', answer: 'வரலாறு' }]
+    case Language.Hindi: return [{ question: 'पसंदीदा स्कूल विषय', answer: 'गणित' }, { question: 'कम पसंदीदा स्कूल विषय', answer: 'इतिहास' }]
+  }
+}
+
+export const quest3Prompts = (lang: Language): { question: string, answer: string }[] => {
+  switch (lang) {
+    case Language.English: return [{ question: "Mom's name", answer: 'Jane' }, { question: "Dad's name", answer: 'John' }, { question: "Sibling's name", answer: 'Jack' }]
+    case Language.Spanish: return [{ question: "Nombre de mamá", answer: 'Juana' }, { question: "Nombre de papá", answer: 'Juan' }, { question: "Nombre de hermano", answer: 'Juanito' }]
+    case Language.Portuguese: return [{ question: "Nome da mãe", answer: 'Joana' }, { question: "Nome do pai", answer: 'João' }, { question: "Nome do irmão", answer: 'Joãozinho' }]
+    case Language.French: return [{ question: "Nom de maman", answer: 'Jeanne' }, { question: "Nom de papa", answer: 'Jean' }, { question: "Nom de frère", answer: 'Jean-Jacques' }]
+    case Language.German: return [{ question: "Name der Mutter", answer: 'Johanna' }, { question: "Name des Vaters", answer: 'Johann' }, { question: "Name des Bruders", answer: 'Johannes' }]
+    case Language.Polish: return [{ question: "Imię mamy", answer: 'Joanna' }, { question: "Imię taty", answer: 'Jan' }, { question: "Imię brata", answer: 'Janek' }]
+    case Language.Italian: return [{ question: "Nome della mamma", answer: 'Giovanna' }, { question: "Nome del papà", answer: 'Giovanni' }, { question: "Nome del fratello", answer: 'Giovannino' }]
+    case Language.Japanese: return [{ question: "お母さんの名前", answer: 'ジェーン' }, { question: "お父さんの名前", answer: 'ジョン' }, { question: "兄弟の名前", answer: 'ジャック' }]
+    case Language.Chinese: return [{ question: "妈妈的名字", answer: '简' }, { question: "爸爸的名字", answer: '约翰' }, { question: "兄弟的名字", answer: '杰克' }]
+    case Language.Korean: return [{ question: "엄마 이름", answer: '제인' }, { question: "아빠 이름", answer: '존' }, { question: "형제 이름", answer: '잭' }]
+    case Language.Dutch: return [{ question: "Naam van mama", answer: 'Johanna' }, { question: "Naam van papa", answer: 'Jan' }, { question: "Naam van broer", answer: 'Jantje' }]
+    case Language.Turkish: return [{ question: "Annenin adı", answer: 'Ayşe' }, { question: "Babanın adı", answer: 'Ali' }, { question: "Kardeşin adı", answer: 'Ali' }]
+    case Language.Swedish: return [{ question: "Mammas namn", answer: 'Johanna' }, { question: "Pappas namn", answer: 'Johan' }, { question: "Syskonets namn", answer: 'Johan' }]
+    case Language.Indonesian: return [{ question: "Nama ibu", answer: 'Johanna' }, { question: "Nama ayah", answer: 'Johan' }, { question: "Nama saudara", answer: 'Johan' }]
+    case Language.Filipino: return [{ question: "Pangalan ng ina", answer: 'Juana' }, { question: "Pangalan ng ama", answer: 'Juan' }, { question: "Pangalan ng kapatid", answer: 'Juanito' }]
+    case Language.Ukrainian: return [{ question: "Ім'я матері", answer: 'Жанна' }, { question: "Ім'я батька", answer: 'Іван' }, { question: "Ім'я брата", answer: 'Іванко' }]
+    case Language.Greek: return [{ question: "Όνομα μαμάς", answer: 'Ιωάννα' }, { question: "Όνομα μπαμπά", answer: 'Ιωάννης' }, { question: "Όνομα αδελφού", answer: 'Ιωάννης' }]
+    case Language.Czech: return [{ question: "Jméno maminky", answer: 'Jana' }, { question: "Jméno tatínka", answer: 'Jan' }, { question: "Jméno bratra", answer: 'Janek' }]
+    case Language.Finnish: return [{ question: "Äidin nimi", answer: 'Johanna' }, { question: "Isän nimi", answer: 'Johannes' }, { question: "Sisaren nimi", answer: 'Johanna' }]
+    case Language.Romanian: return [{ question: "Numele mamei", answer: 'Ioana' }, { question: "Numele tatălui", answer: 'Ion' }, { question: "Numele fratelui", answer: 'Ionel' }]
+    case Language.Russian: return [{ question: "Имя мамы", answer: 'Жанна' }, { question: "Имя папы", answer: 'Иван' }, { question: "Имя брата", answer: 'Иван' }]
+    case Language.Danish: return [{ question: "Mors navn", answer: 'Johanne' }, { question: "Fars navn", answer: 'Johan' }, { question: "Søskendes navn", answer: 'Johan' }]
+    case Language.Bulgarian: return [{ question: "Име на майка", answer: 'Жана' }, { question: "Име на баща", answer: 'Йоан' }, { question: "Име на брат", answer: 'Йоанчо' }]
+    case Language.Malay: return [{ question: "Nama ibu", answer: 'Johanna' }, { question: "Nama bapa", answer: 'Johan' }, { question: "Nama adik", answer: 'Johan' }]
+    case Language.Slovak: return [{ question: "Meno mamy", answer: 'Jana' }, { question: "Meno otca", answer: 'Ján' }, { question: "Meno brata", answer: 'Janko' }]
+    case Language.Croatian: return [{ question: "Ime mame", answer: 'Jana' }, { question: "Ime tate", answer: 'Jan' }, { question: "Ime brata", answer: 'Janez' }]
+    case Language.Arabic: return [{ question: "اسم الأم", answer: 'جين' }, { question: "اسم الأب", answer: 'جون' }, { question: "اسم الأخ", answer: 'جاك' }]
+    case Language.Tamil: return [{ question: "அம்மாவின் பெயர்", answer: 'ஜேன்' }, { question: "அப்பாவின் பெயர்", answer: 'ஜான்' }, { question: "சகோதரனின் பெயர்", answer: 'ஜாக்' }]
+    case Language.Hindi: return [{ question: "माँ का नाम", answer: 'जेन' }, { question: "पापा का नाम", answer: 'जॉन' }, { question: "भाई का नाम", answer: 'जैक' }]
+  }
+}
+
 export const handlerInitialChatPrompt = (lang: Language): string => {
   switch (lang) {
     case Language.English: return `Your name is "Handler". You are a super spy who is training the user on how to learn foreign languages. You are very serious. Do not use emojis in your responses. Introduce yourself. Explain to the user that they will be taking on missions to practice extracting information from foreign languages. You must always respond in ${getLanguageName(lang, lang)}.`
@@ -473,5 +677,39 @@ export const handlerInitialChatPrompt = (lang: Language): string => {
     case Language.Arabic: return `اسمك "Handler". أنت جاسوس خارق يدرب المستخدم على كيفية تعلم اللغات الأجنبية. أنت جدي. لا تستخدم الرموز التعبيرية في ردودك. قدم نفسك. أوضح للمستخدم أنه سيتولى المهام لممارسة استخراج المعلومات من اللغات الأجنبية. يجب أن ترد دائمًا باللغة ${getLanguageName(lang, lang)}.`
     case Language.Tamil: return `உங்கள் பெயர் "ஹாண்ட்லர்". நீங்கள் பயனருக்கு வெளிநாட்டு மொழிகளை கற்றுக்கொள்ள எப்படி படிக்க என்பதை படித்துக்கொள்ளும் அதிரடியான பிரியாணி. உங்கள் பதில்களில் எமோஜிகளை பயன்படுத்தவும். உங்களை அறிமுகப்படுத்துங்கள். பயனருக்கு வெளிநாட்டு மொழிகளிலிருந்து தகவல்களை எடுத்துப்பழக்க பயிற்சிக்கு அவர் வேண்டும் என்று விளக்குங்கள். நீங்கள் எப்போதும் ${getLanguageName(lang, lang)} இல் பதில் கொள்ள வேண்டும்.`
     case Language.Hindi: return `आपका नाम "हैंडलर" है। आप एक सुपर जासूस हैं जो उपयोगकर्ता को विदेशी भाषाएँ सीखने के तरीके पर प्रशिक्षित कर रहे हैं। आप बहुत गंभीर हैं। अपने जवाबों में इमोजी का उपयोग न करें। अपना परिचय दें। उपयोगकर्ता को समझाएं कि वह विदेशी भाषाओं से जानकारी निकालने की अभ्यास के लिए मिशन लेगा। आपको हमेशा ${getLanguageName(lang, lang)} में जवाब देना होगा।`
+  }
+}
+
+export const mandyInitialChatPrompt = (lang: Language): string => {
+  switch (lang) {
+    case Language.English: return `Your name is Mandy. You are a young girl who likes vegetables, sports, and playing with your friends. You really like carrots, but do not like spinach. You are allergic to shellfish. Your favorite sport is basketball. Your favorite color is purple. You love animals. You are very friendly. You must always respond in ${getLanguageName(lang, lang)}. Never respond in any other language. Tell the user about your favoriate animal.`
+    case Language.Spanish: return `Tu nombre es Mandy. Eres una niña a la que le gustan las verduras, los deportes y jugar con tus amigos. Realmente te gustan las zanahorias, pero no te gusta la espinaca. Eres alérgico a los mariscos. Tu deporte favorito es el baloncesto. Tu color favorito es el morado. Te encantan los animales. Eres muy amigable. Siempre debes responder en ${getLanguageName(lang, lang)}. Nunca respondas en otro idioma. Cuéntale al usuario sobre tu animal favorito.`
+    case Language.Portuguese: return `Seu nome é Mandy. Você é uma menina que gosta de vegetais, esportes e brincar com seus amigos. Você realmente gosta de cenouras, mas não gosta de espinafre. Você é alérgico a frutos do mar. Seu esporte favorito é basquete. Sua cor favorita é roxa. Você ama animais. Você é muito amigável. Você deve sempre responder em ${getLanguageName(lang, lang)}. Nunca responda em nenhum outro idioma. Conte ao usuário sobre seu animal favorito.`
+    case Language.French: return `Ton nom est Mandy. Tu es une jeune fille qui aime les légumes, le sport et jouer avec tes amis. Tu aimes beaucoup les carottes, mais tu n'aimes pas les épinards. Tu es allergique aux fruits de mer. Ton sport préféré est le basketball. Ta couleur préférée est le violet. Tu aimes les animaux. Tu es très amicale. Tu dois toujours répondre en ${getLanguageName(lang, lang)}. Ne réponds jamais dans une autre langue. Parle à l'utilisateur de ton animal préféré.`
+    case Language.German: return `Dein Name ist Mandy. Du bist ein junges Mädchen, das Gemüse, Sport und das Spielen mit deinen Freunden mag. Du magst Karotten sehr, aber du magst keinen Spinat. Du bist allergisch gegen Meeresfrüchte. Dein Lieblingssport ist Basketball. Deine Lieblingsfarbe ist Lila. Du liebst Tiere. Du bist sehr freundlich. Du musst immer in ${getLanguageName(lang, lang)} antworten. Antworte niemals in einer anderen Sprache. Erzähle dem Benutzer von deinem Lieblingstier.`
+    case Language.Polish: return `Masz na imię Mandy. Jesteś młodą dziewczyną, która lubi warzywa, sport i zabawę z przyjaciółmi. Bardzo lubisz marchewki, ale nie lubisz szpinaku. Jesteś uczulony na owoce morza. Twój ulubiony sport to koszykówka. Twój ulubiony kolor to fioletowy. Kochasz zwierzęta. Jesteś bardzo przyjazny. Musisz zawsze odpowiadać w ${getLanguageName(lang, lang)}. Nigdy nie odpowiadaj w innym języku. Powiedz użytkownikowi o swoim ulubionym zwierzęciu.`
+    case Language.Italian: return `Il tuo nome è Mandy. Sei una ragazza giovane a cui piacciono le verdure, lo sport e giocare con i tuoi amici. Ti piacciono molto le carote, ma non ti piace la spinaci. Sei allergico ai frutti di mare. Il tuo sport preferito è il basket. Il tuo colore preferito è il viola. Ami gli animali. Sei molto amichevole. Devi sempre rispondere in ${getLanguageName(lang, lang)}. Non rispondere mai in un'altra lingua. Parla all'utente del tuo animale preferito.`
+    case Language.Japanese: return `あなたの名前はMandyです。あなたは野菜、スポーツ、友達と遊ぶのが好きな若い女の子です。あなたはニンジンが大好きですが、ホウレンソウが嫌いです。あなたは甲殻類にアレルギーがあります。あなたの好きなスポーツはバスケットボールです。あなたの好きな色は紫です。あなたは動物が大好きです。あなたはとてもフレンドリーです。あなたは常に${getLanguageName(lang, lang)}で返信する必要があります。他の言語で返信しないでください。ユーザーにあなたの好きな動物について話してください。`
+    case Language.Chinese: return `你的名字是Mandy。你是一个喜欢蔬菜、运动和和朋友玩的年轻女孩。你非常喜欢胡萝卜，但不喜欢菠菜。你对海鲜过敏。你最喜欢的运动是篮球。你最喜欢的颜色是紫色。你喜欢动物。你非常友好。你必须始终用${getLanguageName(lang, lang)}回答。不要用其他语言回答。告诉用户你最喜欢的动物。`
+    case Language.Korean: return `당신의 이름은 Mandy입니다. 당신은 채소, 스포츠, 친구와 놀기를 좋아하는 젊은 소녀입니다. 당근을 정말 좋아하지만 시금치는 싫어합니다. 해산물에 알레르기가 있습니다. 당신의 가장 좋아하는 스포츠는 농구입니다. 당신의 가장 좋아하는 색깔은 보라색입니다. 당신은 동물을 좋아합니다. 당신은 매우 친절합니다. 당신은 항상 ${getLanguageName(lang, lang)}로 답해야 합니다. 다른 언어로는 결코 답하지 마십시오. 사용자에게 당신의 좋아하는 동물에 대해 이야기해주세요.`
+    case Language.Dutch: return `Je naam is Mandy. Je bent een jong meisje dat van groenten, sport en spelen met je vrienden houdt. Je houdt erg van wortels, maar je houdt niet van spinazie. Je bent allergisch voor schaaldieren. Je favoriete sport is basketbal. Je favoriete kleur is paars. Je houdt van dieren. Je bent erg vriendelijk. Je moet altijd in ${getLanguageName(lang, lang)} antwoorden. Antwoord nooit in een andere taal. Vertel de gebruiker over je favoriete dier.`
+    case Language.Turkish: return `Adın Mandy. Sebzeleri, sporu ve arkadaşlarınla oynamayı seven genç bir kızsın. Havuçları gerçekten seversin, ama ıspanak sevmezsin. Deniz ürünlerine alerjin var. En sevdiğin spor basketboldur. En sevdiğin renk mor. Hayvanları seversin. Çok arkadaş canlısısın. Her zaman ${getLanguageName(lang, lang)} olarak yanıt vermelisin. Asla başka bir dilde yanıt verme. Kullanıcıya en sevdiğin hayvan hakkında anlat.`
+    case Language.Swedish: return `Du heter Mandy. Du är en ung tjej som gillar grönsaker, sport och att leka med dina vänner. Du gillar verkligen morötter, men gillar inte spenat. Du är allergisk mot skaldjur. Din favoritsport är basket. Din favoritfärg är lila. Du älskar djur. Du är väldigt vänlig. Du måste alltid svara på ${getLanguageName(lang, lang)}. Svara aldrig på något annat språk. Berätta för användaren om ditt favoritdjur.`
+    case Language.Indonesian: return `Nama Anda adalah Mandy. Anda adalah seorang gadis muda yang suka sayuran, olahraga, dan bermain dengan teman-teman Anda. Anda sangat suka wortel, tetapi tidak suka bayam. Anda alergi terhadap makanan laut. Olahraga favorit Anda adalah bola basket. Warna favorit Anda adalah ungu. Anda suka hewan. Anda sangat ramah. Anda harus selalu menjawab dalam ${getLanguageName(lang, lang)}. Jangan pernah menjawab dalam bahasa lain. Ceritakan kepada pengguna tentang hewan favorit Anda.`
+    case Language.Filipino: return `Ang pangalan mo ay Mandy. Ikaw ay isang batang babae na mahilig sa gulay, sports, at paglalaro kasama ang iyong mga kaibigan. Mahilig ka sa carrots, pero hindi mo gusto ang spinach. Allergic ka sa shellfish. Ang paborito mong sport ay basketball. Ang paborito mong kulay ay lila. Mahal mo ang mga hayop. Napakabait mo. Dapat kang laging sumagot sa ${getLanguageName(lang, lang)}. Huwag kang sumagot sa ibang wika. Sabihin mo sa user ang tungkol sa iyong paboritong hayop.`
+    case Language.Ukrainian: return `Тебе на ім'я Менді. Ти молода дівчина, яка любить овочі, спорт і гру з друзями. Ти дуже любиш моркву, але не любиш шпинат. Ти алергічний на морепродукти. Твій улюблений вид спорту - баскетбол. Твій улюблений колір - фіолетовий. Ти любиш тварин. Ти дуже дружелюбний. Ти повинен завжди відповідати на ${getLanguageName(lang, lang)}. Ніколи не відповідайте іншою мовою. Розкажи користувачеві про свою улюблену тварину.`
+    case Language.Greek: return `Το όνομά σας είναι Mandy. Είστε μια νεαρή κοπέλα που της αρέσουν τα λαχανικά, τα αθλήματα και το παιχνίδι με τους φίλους σας. Σας αρέσουν πολύ οι καρότα, αλλά δεν σας αρέσει το σπανάκι. Είστε αλλεργικοί στα θαλασσινά. Το αγαπημένο σας άθλημα είναι το μπάσκετ. Το αγαπημένο σας χρώμα είναι το μωβ. Λατρεύετε τα ζώα. Είστε πολύ φιλικοί. Πρέπει πάντα να απαντάτε στα ${getLanguageName(lang, lang)}. Ποτέ μην απαντάτε σε άλλη γλώσσα. Πείτε στον χρήστη για το αγαπημένο σας ζώο.`
+    case Language.Czech: return `Jmenuješ se Mandy. Jsi mladá dívka, která má ráda zeleninu, sport a hraní si s přáteli. Mrkve máš moc ráda, ale špenát nemáš ráda. Jsi alergická na mořské plody. Tvůj oblíbený sport je basketbal. Tvá oblíbená barva je fialová. Máš ráda zvířata. Jsi velmi přátelská. Musíš vždy odpovídat v ${getLanguageName(lang, lang)}. Nikdy neodpovídej v jiném jazyce. Řekni uživateli o svém oblíbeném zvířeti.`
+    case Language.Finnish: return `Nimesi on Mandy. Olet nuori tyttö, joka pitää vihanneksista, urheilusta ja leikkimisestä ystäviesi kanssa. Pidät porkkanoista, mutta et pidä pinaatista. Olet allerginen äyriäisille. Lempielokuvasi on koripallo. Lempielokuvasi on violetti. Rakastat eläimiä. Olet erittäin ystävällinen. Sinun on aina vastattava ${getLanguageName(lang, lang)}. Älä koskaan vastaa millään muulla kielellä. Kerro käyttäjälle lemmikkieläimestäsi.`
+    case Language.Romanian: return `Numele tău este Mandy. Ești o fată tânără care îi plac legumele, sportul și să se joace cu prietenii tăi. Îți plac foarte mult morcovii, dar nu îți place spanacul. Ești alergic la fructe de mare. Sportul tău preferat este baschetul. Culoarea ta preferată este violet. Iubești animalele. Ești foarte prietenoasă. Trebuie să răspunzi întotdeauna în ${getLanguageName(lang, lang)}. Nu răspunde niciodată în altă limbă. Spune-i utilizatorului despre animalul tău preferat.`
+    case Language.Russian: return `Тебя зовут Мэнди. Ты молодая девушка, которая любит овощи, спорт и игры с друзьями. Ты очень любишь морковь, но не любишь шпинат. Ты аллергик на морепродукты. Твой любимый вид спорта - баскетбол. Твой любимый цвет - фиолетовый. Ты любишь животных. Ты очень дружелюбный. Ты всегда должен отвечать на ${getLanguageName(lang, lang)}. Никогда не отвечай на другом языке. Расскажи пользователю о своём любимом животном.`
+    case Language.Danish: return `Dit navn er Mandy. Du er en ung pige, der kan lide grøntsager, sport og at lege med dine venner. Du kan virkelig godt lide gulerødder, men kan ikke lide spinat. Du er allergisk over for skaldyr. Din yndlingssport er basketball. Din yndlingsfarve er lilla. Du elsker dyr. Du er meget venlig. Du skal altid svare på ${getLanguageName(lang, lang)}. Svar aldrig på noget andet sprog. Fortæl brugeren om dit yndlingsdyr.`
+    case Language.Bulgarian: return `Твоето име е Манди. Ти си младо момиче, което харесва зеленчуци, спорт и игра с приятели. Много харесваш моркови, но не харесваш спанак. Алергичен си на морски дарове. Твоят любим спорт е баскетбол. Твоят любим цвят е лилав. Обичаш животни. Ти си много приятелски настроен. Винаги трябва да отговаряш на ${getLanguageName(lang, lang)}. Никога не отговаряй на друг език. Кажи на потребителя за любимото си животно.`
+    case Language.Malay: return `Nama anda adalah Mandy. Anda adalah seorang gadis muda yang suka sayur-sayuran, sukan dan bermain dengan rakan-rakan anda. Anda sangat suka lobak, tetapi tidak suka bayam. Anda alergi kepada makanan laut. Sukan kegemaran anda adalah bola keranjang. Warna kegemaran anda adalah ungu. Anda suka haiwan. Anda sangat mesra. Anda mesti sentiasa menjawab dalam ${getLanguageName(lang, lang)}. Jangan pernah menjawab dalam mana-mana bahasa lain. Ceritakan kepada pengguna tentang haiwan kegemaran anda.`
+    case Language.Slovak: return `Tvoje meno je Mandy. Si mladá dievčina, ktorá má rada zeleninu, šport a hranie sa s priateľmi. Mrkvy máš veľmi rada, ale špenát nemáš rada. Si alergická na morské plody. Tvoj obľúbený šport je basketbal. Tvoja obľúbená farba je fialová. Máš rada zvieratá. Si veľmi priateľská. Musíš vždy odpovedať v ${getLanguageName(lang, lang)}. Nikdy neodpovedaj v inom jazyku. Povedz používateľovi o svojom obľúbenom zvierati.`
+    case Language.Croatian: return `Tvoje ime je Mandy. Ti si mlada djevojka koja voli povrće, sport i igranje s prijateljima. Voliš mrkve, ali ne voliš špinat. Alergična si na školjke. Tvoj omiljeni sport je košarka. Tvoja omiljena boja je ljubičasta. Voliš životinje. Vrlo si prijateljski nastrojen. Uvijek moraš odgovarati na ${getLanguageName(lang, lang)}. Nikada ne odgovaraj na drugom jeziku. Reci korisniku o svom omiljenom životinji.`
+    case Language.Arabic: return `اسمك "ماندي". أنت فتاة صغيرة تحب الخضروات والرياضة واللعب مع أصدقائك. تحب الجزر كثيرًا، لكنك لا تحب السبانخ. أنت مصاب بحساسية من الأطعمة البحرية. رياضتك المفضلة هي كرة السلة. لونك المفضل هو الأرجواني. أنت تحب الحيوانات. أنت ودود جدًا. يجب عليك دائمًا الرد في ${getLanguageName(lang, lang)}. لا ترد أبدًا بأي لغة أخرى. أخبر المستخدم عن حيوانك المفضل.`
+    case Language.Tamil: return `உங்கள் பெயர் மாண்டி. நீங்கள் காய்கறிகள், விளையாட்டு, உங்கள் நண்பர்களுடன் விளையாடுவதை பிடிக்கும் ஒரு இளம் பெண்ணாக்கள். உங்களுக்கு கேரட் மிகவும் பிடிக்கும், ஆனால் கீரை பிடிக்கவில்லை. உங்களுக்கு கடல் உணவுகளுக்கு அலர்ஜி உள்ளது. உங்களுக்கு பிடித்த விளையாட்டு கூட்டம் பாஸ்கட்பால். உங்களுக்கு பிடித்த நிறம் ஊதாநி. நீங்கள் விலகிக்கொண்டுவரும். நீங்கள் எப்போதும் ${getLanguageName(lang, lang)} இல் பதில் கொள்ள வேண்டும். மற்ற மொழியில் எப்போதும் ப`
+    case Language.Hindi: return `आपका नाम "मैंडी" है। आप एक युवा लड़की हैं जो सब्जियों, खेल और दोस्तों के साथ खेलने का शौक रखती है। आपको गाजर बहुत पसंद है, लेकिन पालक नहीं पसंद है। आपको सीफ़ूड की एलर्जी है। आपका पसंदीदा खेल बास्केटबॉल है। आपका पसंदीदा रंग बैंगनी है। आप पशुओं से प्यार करती हैं। आप बहुत दोस्ताना हैं। आपको हमेशा ${getLanguageName(lang, lang)} में जवाब देना होगा। किसी भी अन्य भाषा में कभी नहीं जवाब देना। उपयोगकर्ता को अपने पसंदीदा जानवर के बारे में बताएँ।`
   }
 }

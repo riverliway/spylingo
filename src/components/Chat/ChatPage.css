@@ -114,3 +114,33 @@
 .chatQuestMenuItem:hover {
   background-color: #3e428e;
 }
+
+.chatQuestContain {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 14px;
+}
+
+.chatQuestTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 5px;
+}
+
+.chatQuests {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chatQuestItem {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: flex-start;
+}
+
+.chatQuestIcon {
+  margin-top: 1px;
+}
