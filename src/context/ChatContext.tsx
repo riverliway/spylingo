@@ -34,6 +34,12 @@ export type ChatMessage = ChatMessageRaw & {
 export interface ChatData {
   messages: ChatMessage[]
   agent: ChatAgent
+  quests: Quest[]
+}
+
+interface Quest {
+  question: string
+  answer: string
 }
 
 interface ChatAgent {
@@ -125,20 +131,32 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
     await api.togetherAi.chat({
       model: TogetherChatModel.Code_Llama_Instruct_70B,
       messages: [{ role: 'system', content: chats[index].agent.initialChatPrompt }, ...messages.slice(0, -1)],
+      repetitionPenalty: 1.2,
       streamCallback: v => {
         if (v !== 'done') {
           const newContent = v.choices[0].delta.content
           audioChunk += newContent
 
-          streamQueueRef.current.messageIndex = chats[index].messages.length - 1
-          streamQueueRef.current.queue.push(newContent)
-          streamQueueRef.current.done = doneCallback ?? (() => {})
+          if (autoPlayAudio) {
+            streamQueueRef.current.messageIndex = chats[index].messages.length - 1
+            streamQueueRef.current.queue.push(newContent)
+            streamQueueRef.current.done = doneCallback ?? (() => {})
+          } else {
+            setChats(chats => {
+              const newChats = [...chats]
+              newChats[level].messages[chats[index].messages.length - 1].content += newContent
+              return newChats
+            })
+          }
 
           if (autoPlayAudio && ['.', '!', '?', '。', '！', '？'].some(c => audioChunk.trim().endsWith(c))) {
             api.playAudioStream(audioChunk, chats[index].agent.voiceId)
             audioChunk = ''
           }
         } else {
+          if (!autoPlayAudio) {
+            doneCallback?.()
+          }
           if (autoPlayAudio && audioChunk.trim().length > 0) {
             api.playAudioStream(audioChunk, chats[index].agent.voiceId)
           }
@@ -217,7 +235,7 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
   const value = {
     chats,
     createNewChat: (agent: ChatAgent) => {
-      setChats([...chats, { messages: [], agent }])
+      setChats([...chats, { messages: [], agent, quests: [] }])
     },
     sendMessage,
     introduce: async (index: number, doneCallback?: () => void): Promise<void> => {
@@ -281,14 +299,16 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
 const createInitialChats = (): ChatData[] => {
   return [{
     messages: [{ role: 'assistant', content: '', isPlayingAudio: false }],
-    agent: createHandler()
+    agent: createHandler(),
+    quests: []
   }, {
+    quests: [],
     messages: [{ role: 'assistant', content: '', isPlayingAudio: false }],
     agent: {
       name: 'Mandy',
       voiceId: 'jsCqWAovK2LkecY7zXl4',
       baseImagePrompt: 'Draw an anime girl with pink hair. The character is wearing casual clothes and a skirt.',
-      initialChatPrompt: 'Your name is Mandy. You are a young girl who likes vegetables, sports, and playing with your friends. You really like carrots, but wait for the user to ask you what kinds of vegetables you like before telling them. You are very friendly. Introduce yourself.',
+      initialChatPrompt: 'Your name is Mandy. You are a young girl who likes vegetables, sports, and playing with your friends. You really like carrots, but do not like spinach. You are allergic to shellfish. Your favorite sport is basketball. Your favorite color is purple. You love animals. You are very friendly. Tell the user about your favoriate animal.',
     }
   }]
 }

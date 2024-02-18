@@ -29,6 +29,7 @@ export const Router: React.FC = () => {
         subTitle={selectForeignLanguageSubPrompt(nativeLanguage)}
         setLanguage={setForeignLanguage}
         hiddenLanguage={nativeLanguage}
+        inLanguage={nativeLanguage}
       />
     )
   }

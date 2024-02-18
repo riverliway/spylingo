@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Language, languageNames } from '../../utils/languages'
+import { Language, getLanguageName } from '../../utils/languages'
 import { paginateArray } from '../../utils/paginateArray'
 import './ChooseLanguage.css'
 
@@ -8,6 +8,7 @@ interface ChooseLanguageProps {
   subTitle?: string
   setLanguage: (lang: Language) => void
   hiddenLanguage?: Language
+  inLanguage?: Language
 }
 
 /**
@@ -38,7 +39,7 @@ export const ChooseLanguage: React.FC<ChooseLanguageProps> = props => {
                 className={`chooseLanguageOption ${lang === props.hiddenLanguage ? 'chooseLanguageOptionHidden' : ''}`}
                 onClick={() => lang !== props.hiddenLanguage && props.setLanguage(lang)}
               >
-                {languageNames[lang]}
+                {getLanguageName(lang, props.inLanguage ?? lang)}
               </div>
             ))}
           </div>
