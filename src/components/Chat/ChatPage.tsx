@@ -9,14 +9,19 @@ import { exitPrompt, hintPrompt, objectivePrompt, settingsPrompt, typeMessagePro
 import { useSettings } from '../../context/SettingsContext'
 import { SettingsModal } from '../SettingsModal/SettingsModal'
 import { HintModal } from '../HintModal/HintModal'
+import { CorrectionModal } from '../CorrectionModal/CorrectionModal'
+import { useAPI } from '../../context/apiContext'
+import { asyncTimeout } from '../../utils/asyncTimeout'
 
 export const ChatPage: React.FC<ChatData & { index: number }> = props => {
+  const api = useAPI()
   const { nativeLanguage, setLevel } = useSettings()
   const chatData = useChatInfo()
   const [sendingContent, setSendingContent] = useState('')
   const [isResponding, setIsResponding] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [hintOpen, setHintOpen] = useState(false)
+  const [correctionOpen, setCorrectionOpen] = useState<number | undefined>()
   const [hoverStates, setHoverStates] = useState<number[]>([])
 
   const sendMessage = async (): Promise<void> => {
@@ -30,11 +35,35 @@ export const ChatPage: React.FC<ChatData & { index: number }> = props => {
 
     setIsResponding(false)
   }
+
+  const playAudioStream = async (index: number): Promise<void> => {
+    const messages = splitOnPunctuation(props.messages[index].content)
+    for (let i = 0; i < messages.length; i++) {
+      const message = messages[i]
+      await asyncTimeout(i < 5 ? 100 : 1000)
+      void api.playAudioStream(message, props.agent.voiceId)
+    }
+  }
+
+  const splitOnPunctuation = (message: string): string[] => {
+    const punctuation = ['.', '!', '?', '。', '！', '？']
+    const segments = ['']
+
+    for (const char of message) {
+      segments[segments.length - 1] += char
+      if (punctuation.includes(char)) {
+        segments.push('')
+      }
+    }
+
+    return segments.filter(segment => segment.trim().length > 0)
+  }
   
   return (
     <div className='chatWindowContain'>
       <SettingsModal open={settingsOpen} close={() => setSettingsOpen(false)} />
       <HintModal open={hintOpen} close={() => setHintOpen(false)} />
+      <CorrectionModal messageIndex={correctionOpen!} open={correctionOpen !== undefined} close={() => setCorrectionOpen(undefined)} />
       <div className='imageContain'>
         <ChatImage {...props} responding={isResponding} className='chatImage' />
       </div>
@@ -46,10 +75,11 @@ export const ChatPage: React.FC<ChatData & { index: number }> = props => {
             onHover={isHovering => setHoverStates(h => h.filter(i => i !== -1).concat(isHovering ? [-1] : []))}
             showActionItems={props.index === 0 ? false : hoverStates.includes(-1) || hoverStates.includes(0)}
             isPlayingAudio={props.messages[0].isPlayingAudio}
-            playAudio={() => chatData.playAudio(0)}
+            playAudio={() => playAudioStream(0)}
             translateWholeMessage={() => chatData.translateMessage(0)}
             clearExtraContent={() => {}}
             translateWord={word => chatData.translateWord(0, word)}
+            openCorrectionModal={() => {}}
           />
           {props.messages.map((message, index) => (
             <ChatBubble
@@ -58,10 +88,11 @@ export const ChatPage: React.FC<ChatData & { index: number }> = props => {
               onHover={isHovering => setHoverStates(h => h.filter(i => i !== index).concat(isHovering ? [index] : []))}
               showActionItems={props.index === 0 ? false : hoverStates.includes(index) || hoverStates.includes(index + 1)}
               isPlayingAudio={props.messages.length > index + 1 ? props.messages[index + 1].isPlayingAudio : false}
-              playAudio={() => chatData.playAudio(index + 1)}
+              playAudio={() => playAudioStream(index + 1)}
               translateWholeMessage={() => chatData.translateMessage(index + 1)}
               clearExtraContent={() => chatData.clearExtraContent(index)}
               translateWord={word => chatData.translateWord(index, word)}
+              openCorrectionModal={() => setCorrectionOpen(index)}
             />
           ))}
         </div>

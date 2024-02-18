@@ -13,6 +13,7 @@ interface ChatBubbleProps {
   translateWholeMessage: () => void
   translateWord: (word: string) => void
   clearExtraContent: () => void
+  openCorrectionModal: () => void
 }
 
 export const ChatBubble: React.FC<ChatBubbleProps> = props => {
@@ -44,6 +45,37 @@ export const ChatBubble: React.FC<ChatBubbleProps> = props => {
     className: 'chatBubbleExtraClose'
   }
 
+  const BubbleContent = () => {
+    return (
+      <>
+        {props.message!.role === 'user' && props.message!.correction !== undefined && (
+            <div className='chatCorrectionIcon' onClick={props.openCorrectionModal}>
+              <InfoCircleTwoTone />
+            </div> 
+          )}
+          <div className={`chatBubble ${bubbleClassName}`}>
+            <div className='chatBubbleContents'>
+              <div>
+                {segments.length === 0 ? props.message?.content : segments.map((segment, i) => (
+                  <span key={i} className='chatBubbleSegment' onClick={() => { setSelectedWord(segment); props.translateWord(segment) }}>{segment} </span>
+                ))}
+              </div>
+              {props.message?.appendContent !== undefined && props.message.appendContent}
+            </div>
+            {props.message?.extraContent !== undefined && (
+              <div className='chatBubbleExtra'>
+                <div>{props.message.extraContent}</div>
+                <div className='chatBubbleExtraIcons'>
+                  <CloseOutlined className='chatBubbleExtraClose' onClick={() => {setSelectedWord(undefined); props.clearExtraContent()}} />
+                  {isBookmarked ? <FlagTwoTone {...bookmarkProps} /> : <FlagOutlined {...bookmarkProps} />}
+                </div>
+              </div>
+            )}
+          </div>
+      </>
+    )
+  }
+
   return (
     <div
       className={`chatBubbleContain ${containClassName}`}
@@ -71,32 +103,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = props => {
         </div>
       )}
       {props.message !== undefined && (
-        <div className={props.message.role === 'user' ? 'chatBubbleAndCorrection' : ''}>
-          {props.message.role === 'user' && props.message.correction !== undefined && (
-            <div className='chatCorrectionIcon'>
-              <InfoCircleTwoTone />
-            </div> 
-          )}
-          <div className={`chatBubble ${bubbleClassName}`}>
-            <div className='chatBubbleContents'>
-              <div>
-                {segments.length === 0 ? props.message?.content : segments.map((segment, i) => (
-                  <span key={i} className='chatBubbleSegment' onClick={() => { setSelectedWord(segment); props.translateWord(segment) }}>{segment} </span>
-                ))}
-              </div>
-              {props.message?.appendContent !== undefined && props.message.appendContent}
-            </div>
-            {props.message?.extraContent !== undefined && (
-              <div className='chatBubbleExtra'>
-                <div>{props.message.extraContent}</div>
-                <div className='chatBubbleExtraIcons'>
-                  <CloseOutlined className='chatBubbleExtraClose' onClick={() => {setSelectedWord(undefined); props.clearExtraContent()}} />
-                  {isBookmarked ? <FlagTwoTone {...bookmarkProps} /> : <FlagOutlined {...bookmarkProps} />}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        props.message.role === 'user' ? <div className='chatBubbleAndCorrection'><BubbleContent /></div> : <BubbleContent />
       )}
     </div>
   )

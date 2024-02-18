@@ -1,10 +1,10 @@
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
-import { ChatMessage as ChatMessageRaw, TogetherChatModel, togetherModel } from 'together-ai-sdk'
+import { ChatMessage as ChatMessageRaw, TogetherChatModel } from 'together-ai-sdk'
 import { useAsyncEffect } from '../utils/useAsyncEffect'
 import { useAPI } from './apiContext'
 import { ArtStyle, useSettings } from './SettingsContext'
-import { agent1Image, handlerImage } from '../utils/constants'
-import { generateHintPrompt, handlerInitialChatPrompt, mandyInitialChatPrompt, quest1Prompts, quest2Prompts, translateWordPrompt } from '../utils/prompts'
+import { agent1Image, agent2Image, agent3Image, handlerImage } from '../utils/constants'
+import { generateCorrectionPrompt, generateHintPrompt, handlerInitialChatPrompt, joeyInitialPrompt, mandyInitialChatPrompt, quest1Prompts, quest2Prompts, quest3Prompts, robertInitialPrompt, translateWordPrompt } from '../utils/prompts'
 import { Language } from '../utils/languages'
 
 interface ChatContext {
@@ -22,6 +22,7 @@ interface ChatContext {
   clearHint: () => void
   bookmark: (foreignWord: string) => void
   removeBookmark: (foreignWord: string) => void
+  correctMessage: (messageIndex: number) => void
 }
 
 export type ChatMessage = ChatMessageRaw & {
@@ -160,8 +161,8 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
           complete: false
         }]
 
-        const nativeQuest3 = quest2Prompts(nativeLanguage)
-        const foreignQuest3 = quest2Prompts(foreignLanguage)
+        const nativeQuest3 = quest3Prompts(nativeLanguage)
+        const foreignQuest3 = quest3Prompts(foreignLanguage)
         newChats[3].quests = [{
           nativeQuestion: nativeQuest3[0].question,
           nativeAnswer: nativeQuest3[0].answer,
@@ -177,6 +178,8 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
         }]
 
         newChats[1].agent.initialChatPrompt = mandyInitialChatPrompt(foreignLanguage)
+        newChats[2].agent.initialChatPrompt = joeyInitialPrompt(foreignLanguage)
+        newChats[3].agent.initialChatPrompt = robertInitialPrompt(foreignLanguage)
 
         return newChats
       })
@@ -504,6 +507,25 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
         newChats[level].bookmarks = newChats[level].bookmarks.filter(b => b !== foreignWord)
         return newChats
       })
+    },
+    correctMessage: (messageIndex: number) => {
+      const message = chats[level].messages[messageIndex]
+      const prompt = generateCorrectionPrompt(nativeLanguage, foreignLanguage)
+      let cummunitive = ''
+
+      api.togetherAi.chat({
+        model: TogetherChatModel.Qwen_1_5_Chat_72B,
+        messages: [{ role: 'system', content: prompt }, { role: 'user', content: message.content }],
+        streamCallback: v => {
+          if (v === 'done') return
+          cummunitive += v.choices[0].delta.content
+          setChats(chats => {
+            const newChats = [...chats]
+            newChats[level].messages[messageIndex].correction = cummunitive
+            return newChats
+          })
+        }
+      })
     }
   }
 
@@ -537,10 +559,11 @@ const createInitialChats = (): ChatData[] => {
     quests: [],
     messages: [{ role: 'assistant', content: '', isPlayingAudio: false, finishedGenerating: false }],
     agent: {
-      name: 'Kai',
+      name: 'Joey',
       voiceId: 'IKne3meq5aSn9XLyUdCD',
+      baseImage: agent2Image,
       baseImagePrompt: 'Draw an anime boy with blue hair. The character is wearing casual clothes and jeans. He has blond hair. He is very attractive. He has a small, lean frame.',
-      initialChatPrompt: 'Your name is Kai. You are a young boy who likes to play video games and read books. You really like pizza, but do not like sushi. You are allergic to peanuts. Your favorite video game is Minecraft. Your favorite color is green. You are in high school. You enjoy math but dislike history. Tell the user about your favorite book.',
+      initialChatPrompt: joeyInitialPrompt(Language.English),
     },
     hint: '',
     bookmarks: []
@@ -549,7 +572,8 @@ const createInitialChats = (): ChatData[] => {
     messages: [{ role: 'assistant', content: '', isPlayingAudio: false, finishedGenerating: false }],
     agent: {
       name: 'Robert',
-      voiceId: 'IKne3meq5aSn9XLyUdCD',
+      voiceId: 'VR6AewLTigWG4xSOukaG',
+      baseImage: agent3Image,
       baseImagePrompt: 'Draw an anime grandpa with a cane. The character is wearing a suit and tie. He has a beard and glasses. He is very wise and kind.',
       initialChatPrompt: 'Your name is Robert. You are a grandpa who likes to play chess and read books. You really like apple pie. Your favorite book is "One flew over the cookoo\'s nest". You are a retired teacher. Your mom\'s name is Jane. Your dad\'s name is John. Tell the user about what you did for a living.'
     },

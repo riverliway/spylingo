@@ -69,6 +69,19 @@ export const ApiProvider: React.FC<ApiProviderProps> = props => {
     }
   }
 
+  const fetchAudio = async (voiceId: string, params: any): Promise<string> => {
+    let response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, params)
+    let tries = 0
+    while (tries < 3 && (response.status === 429 || (response.status >= 500 && response.status < 600))) {
+      await asyncTimeout(100)
+      response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, params)
+      tries++
+    }
+
+    const blob = await response.blob()
+    return URL.createObjectURL(blob)
+  }
+
   const value = {
     togetherAi,
     instruct: async (input: string): Promise<string> => {
@@ -112,10 +125,7 @@ export const ApiProvider: React.FC<ApiProviderProps> = props => {
         body: JSON.stringify(params)
       }
 
-      const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, options)
-
-      const blob = await response.blob()
-      const url = URL.createObjectURL(blob)
+      const url = await fetchAudio(voiceId, options)
 
       setCachedAudio(c => [...c, { input, output: url }])
 
@@ -145,10 +155,7 @@ export const ApiProvider: React.FC<ApiProviderProps> = props => {
         body: JSON.stringify(params)
       }
 
-      const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, options)
-
-      const blob = await response.blob()
-      const url = URL.createObjectURL(blob)
+      const url = await fetchAudio(voiceId, options)
 
       audioQueueRef.current = audioQueueRef.current.map(audio => {
         if (audio.prompt === input) {
