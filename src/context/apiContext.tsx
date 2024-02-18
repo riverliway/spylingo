@@ -3,9 +3,11 @@ import { TogetherChatModel, TogetherClient, TogetherImageModel, togetherClient }
 import { asyncTimeout } from '../utils/asyncTimeout'
 import { Language } from '../utils/languages'
 import { translateSentencePrompt } from '../utils/prompts'
+import OpenAI from 'openai'
 
 interface API {
   togetherAi: TogetherClient
+  openAi: OpenAI
   instruct: (input: string) => Promise<string>
   image: (input: string) => Promise<string>
   translate: (input: string, to: Language, callback?: (delta: string) => void) => Promise<string>
@@ -43,6 +45,7 @@ export const ApiProvider: React.FC<ApiProviderProps> = props => {
   const audioQueueRef = useRef<Array<{ prompt: string, audio: string }>>([])
   const [cachedAudio, setCachedAudio] = useState<Array<{ input: string, output: string }>>([])
   const [togetherAi, _setTogetherAi] = useState(togetherClient({ apiKey: TOGETHER_API_KEY, customFetch: window.fetch.bind(window) }))
+  const [openAi, _setOpenAi] = useState(new OpenAI({ apiKey: OPENAI_API_KEY, dangerouslyAllowBrowser: true }))
 
   const playAudioFile = async (input: string): Promise<void> => {
     return new Promise(res => {
@@ -166,7 +169,8 @@ export const ApiProvider: React.FC<ApiProviderProps> = props => {
       })
 
       return response.choices[0].message.content
-    }
+    },
+    openAi
   }
 
   return (

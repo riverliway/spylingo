@@ -79,6 +79,12 @@
   color: #909090;
 }
 
+.chatBubbleExtraIcons {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .chatBubbleExtraClose {
   cursor: pointer;
   margin-top: 5px;
@@ -91,4 +97,20 @@
 .chatBubbleSegment:hover {
   color: #ffffff;
   background-color: #1f1f25;
+}
+
+.chatCorrectionIcon {
+  cursor: pointer;
+  font-size: 18px;
+  margin-top: 4px;
+}
+
+.chatBubbleAndCorrection {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.chatBubbleAndCorrection .chatBubble {
+  max-width: fit-content;
 }

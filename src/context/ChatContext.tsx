@@ -1,11 +1,11 @@
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
-import { ChatMessage as ChatMessageRaw, TogetherChatModel } from 'together-ai-sdk'
+import { ChatMessage as ChatMessageRaw, TogetherChatModel, togetherModel } from 'together-ai-sdk'
 import { useAsyncEffect } from '../utils/useAsyncEffect'
 import { useAPI } from './apiContext'
 import { ArtStyle, useSettings } from './SettingsContext'
 import { agent1Image, handlerImage } from '../utils/constants'
 import { generateHintPrompt, handlerInitialChatPrompt, mandyInitialChatPrompt, quest1Prompts, quest2Prompts, translateWordPrompt } from '../utils/prompts'
-import { Language, getLanguageName } from '../utils/languages'
+import { Language } from '../utils/languages'
 
 interface ChatContext {
   chats: ChatData[]
@@ -20,6 +20,8 @@ interface ChatContext {
   clearExtraContent: (messageIndex: number) => void
   generateHint: () => void
   clearHint: () => void
+  bookmark: (foreignWord: string) => void
+  removeBookmark: (foreignWord: string) => void
 }
 
 export type ChatMessage = ChatMessageRaw & {
@@ -33,6 +35,7 @@ export type ChatMessage = ChatMessageRaw & {
   extraContent?: React.ReactNode
   isPlayingAudio: boolean
   finishedGenerating: boolean
+  correction?: string
 }
 
 export interface ChatData {
@@ -40,6 +43,7 @@ export interface ChatData {
   agent: ChatAgent
   quests: Quest[]
   hint: string
+  bookmarks: string[]
 }
 
 interface Quest {
@@ -307,6 +311,25 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
     })
   }
 
+  const checkCorrectness = async (index: number, messageIndex: number): Promise<void> => {
+    const message = chats[index].messages[messageIndex]
+    const prompt = `You are a grammar model. You must say 'YES' if the user's message contains grammar, spelling, or word order mistakes. You must say 'NO' if it does not. Do not say anything other than 'YES' or 'NO'.`
+
+    const response = await api.openAi.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: 'system', content: prompt }, { role: 'user', content: message.content }],
+      max_tokens: 10,
+    })
+
+    if (response.choices[0].message.content?.toLowerCase().includes('yes')) {
+      setChats(chats => {
+        const newChats = [...chats]
+        newChats[level].messages[messageIndex].correction = ''
+        return newChats
+      })
+    }
+  }
+
   const sendMessage = async (index: number, content: string): Promise<void> => {
     const newChats = [...chats]
     newChats[index].messages.push({
@@ -324,6 +347,9 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
     })
 
     setChats(newChats)
+
+    // Do not await this, as it is not necessary to wait for the correctness to be checked
+    void checkCorrectness(index, newChats[index].messages.length - 2)
 
     await chatAgent(index, newChats[level].messages, () => {
       setChats(chats => {
@@ -355,7 +381,7 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
   const value = {
     chats,
     createNewChat: (agent: ChatAgent) => {
-      setChats([...chats, { messages: [], agent, quests: [], hint: '' }])
+      setChats([...chats, { messages: [], agent, quests: [], hint: '', bookmarks: [] }])
     },
     sendMessage,
     introduce: async (index: number, doneCallback?: () => void): Promise<void> => {
@@ -464,6 +490,20 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
         newChats[level].hint = ''
         return newChats
       })
+    },
+    bookmark: (foreignWord: string) => {
+      setChats(chats => {
+        const newChats = [...chats]
+        newChats[level].bookmarks.push(foreignWord)
+        return newChats
+      })
+    },
+    removeBookmark: (foreignWord: string) => {
+      setChats(chats => {
+        const newChats = [...chats]
+        newChats[level].bookmarks = newChats[level].bookmarks.filter(b => b !== foreignWord)
+        return newChats
+      })
     }
   }
 
@@ -479,7 +519,8 @@ const createInitialChats = (): ChatData[] => {
     messages: [{ role: 'assistant', content: '', isPlayingAudio: false, finishedGenerating: false }],
     agent: createHandler(),
     quests: [],
-    hint: ''
+    hint: '',
+    bookmarks: []
   }, {
     quests: [],
     messages: [{ role: 'assistant', content: '', isPlayingAudio: false, finishedGenerating: false }],
@@ -490,7 +531,8 @@ const createInitialChats = (): ChatData[] => {
       baseImagePrompt: 'Draw an anime girl with pink hair. The character is wearing casual clothes and a skirt.',
       initialChatPrompt: mandyInitialChatPrompt(Language.English),
     },
-    hint: ''
+    hint: '',
+    bookmarks: []
   }, {
     quests: [],
     messages: [{ role: 'assistant', content: '', isPlayingAudio: false, finishedGenerating: false }],
@@ -500,7 +542,8 @@ const createInitialChats = (): ChatData[] => {
       baseImagePrompt: 'Draw an anime boy with blue hair. The character is wearing casual clothes and jeans. He has blond hair. He is very attractive. He has a small, lean frame.',
       initialChatPrompt: 'Your name is Kai. You are a young boy who likes to play video games and read books. You really like pizza, but do not like sushi. You are allergic to peanuts. Your favorite video game is Minecraft. Your favorite color is green. You are in high school. You enjoy math but dislike history. Tell the user about your favorite book.',
     },
-    hint: ''
+    hint: '',
+    bookmarks: []
   }, {
     quests: [],
     messages: [{ role: 'assistant', content: '', isPlayingAudio: false, finishedGenerating: false }],
@@ -510,7 +553,8 @@ const createInitialChats = (): ChatData[] => {
       baseImagePrompt: 'Draw an anime grandpa with a cane. The character is wearing a suit and tie. He has a beard and glasses. He is very wise and kind.',
       initialChatPrompt: 'Your name is Robert. You are a grandpa who likes to play chess and read books. You really like apple pie. Your favorite book is "One flew over the cookoo\'s nest". You are a retired teacher. Your mom\'s name is Jane. Your dad\'s name is John. Tell the user about what you did for a living.'
     },
-    hint: ''
+    hint: '',
+    bookmarks: []
   }]
 }
 

@@ -9,6 +9,7 @@ export default defineConfig({
   ],
   define: {
     TOGETHER_API_KEY: JSON.stringify(process.env.TOGETHER_API_KEY),
-    ELEVEN_LABS_KEY: JSON.stringify(process.env.ELEVEN_LABS_KEY)
+    ELEVEN_LABS_KEY: JSON.stringify(process.env.ELEVEN_LABS_KEY),
+    OPENAI_API_KEY: JSON.stringify(process.env.OPENAI_API_KEY)
   }
 })
