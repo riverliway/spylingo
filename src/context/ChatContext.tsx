@@ -3,9 +3,9 @@ import { ChatMessage as ChatMessageRaw, TogetherChatModel } from 'together-ai-sd
 import { useAsyncEffect } from '../utils/useAsyncEffect'
 import { useAPI } from './apiContext'
 import { ArtStyle, useSettings } from './SettingsContext'
-import { handlerImage } from '../utils/constants'
-import { handlerInitialChatPrompt, mandyInitialChatPrompt, quest1Prompts, quest2Prompts, translateWordPrompt } from '../utils/prompts'
-import { Language } from '../utils/languages'
+import { agent1Image, handlerImage } from '../utils/constants'
+import { generateHintPrompt, handlerInitialChatPrompt, mandyInitialChatPrompt, quest1Prompts, quest2Prompts, translateWordPrompt } from '../utils/prompts'
+import { Language, getLanguageName } from '../utils/languages'
 
 interface ChatContext {
   chats: ChatData[]
@@ -18,6 +18,8 @@ interface ChatContext {
   translateMessage: (messageIndex: number) => Promise<void>
   translateWord: (messageIndex: number, word: string) => Promise<void>
   clearExtraContent: (messageIndex: number) => void
+  generateHint: () => void
+  clearHint: () => void
 }
 
 export type ChatMessage = ChatMessageRaw & {
@@ -37,6 +39,7 @@ export interface ChatData {
   messages: ChatMessage[]
   agent: ChatAgent
   quests: Quest[]
+  hint: string
 }
 
 interface Quest {
@@ -98,6 +101,8 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
 
   useAsyncEffect(async () => {
     for (let i = 1; i < chats.length; i++) {
+      if (chats[i].agent.baseImage !== undefined) continue
+
       const image = await api.image(chats[i].agent.baseImagePrompt)
       setChats(chats => {
         const newChats = [...chats]
@@ -350,7 +355,7 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
   const value = {
     chats,
     createNewChat: (agent: ChatAgent) => {
-      setChats([...chats, { messages: [], agent, quests: [] }])
+      setChats([...chats, { messages: [], agent, quests: [], hint: '' }])
     },
     sendMessage,
     introduce: async (index: number, doneCallback?: () => void): Promise<void> => {
@@ -424,6 +429,41 @@ export const ChatInfoProvider: React.FC<ChatInfoProviderProps> = props => {
           })
         }
       })
+    },
+    generateHint: (): void => {
+      const quest = chats[level].quests.find(q => !q.complete)
+      if (quest === undefined) {
+        setChats(chats => {
+          const newChats = [...chats]
+          newChats[level].hint = 'You have completed all the quests for this level.'
+          return newChats
+        })
+        return
+      }
+
+      const prompt = generateHintPrompt(nativeLanguage, foreignLanguage, quest.nativeQuestion)
+      let cummunitive = ''
+
+      api.togetherAi.chat({
+        model: TogetherChatModel.Qwen_1_5_Chat_72B,
+        messages: [{ role: 'system', content: prompt }],
+        streamCallback: v => {
+          if (v === 'done') return
+          cummunitive += v.choices[0].delta.content
+          setChats(chats => {
+            const newChats = [...chats]
+            newChats[level].hint = cummunitive
+            return newChats
+          })
+        }
+      })
+    },
+    clearHint: () => {
+      setChats(chats => {
+        const newChats = [...chats]
+        newChats[level].hint = ''
+        return newChats
+      })
     }
   }
 
@@ -438,16 +478,19 @@ const createInitialChats = (): ChatData[] => {
   return [{
     messages: [{ role: 'assistant', content: '', isPlayingAudio: false, finishedGenerating: false }],
     agent: createHandler(),
-    quests: []
+    quests: [],
+    hint: ''
   }, {
     quests: [],
     messages: [{ role: 'assistant', content: '', isPlayingAudio: false, finishedGenerating: false }],
     agent: {
       name: 'Mandy',
       voiceId: 'jsCqWAovK2LkecY7zXl4',
+      baseImage: agent1Image,
       baseImagePrompt: 'Draw an anime girl with pink hair. The character is wearing casual clothes and a skirt.',
       initialChatPrompt: mandyInitialChatPrompt(Language.English),
-    }
+    },
+    hint: ''
   }, {
     quests: [],
     messages: [{ role: 'assistant', content: '', isPlayingAudio: false, finishedGenerating: false }],
@@ -456,7 +499,8 @@ const createInitialChats = (): ChatData[] => {
       voiceId: 'IKne3meq5aSn9XLyUdCD',
       baseImagePrompt: 'Draw an anime boy with blue hair. The character is wearing casual clothes and jeans. He has blond hair. He is very attractive. He has a small, lean frame.',
       initialChatPrompt: 'Your name is Kai. You are a young boy who likes to play video games and read books. You really like pizza, but do not like sushi. You are allergic to peanuts. Your favorite video game is Minecraft. Your favorite color is green. You are in high school. You enjoy math but dislike history. Tell the user about your favorite book.',
-    }
+    },
+    hint: ''
   }, {
     quests: [],
     messages: [{ role: 'assistant', content: '', isPlayingAudio: false, finishedGenerating: false }],
@@ -465,7 +509,8 @@ const createInitialChats = (): ChatData[] => {
       voiceId: 'IKne3meq5aSn9XLyUdCD',
       baseImagePrompt: 'Draw an anime grandpa with a cane. The character is wearing a suit and tie. He has a beard and glasses. He is very wise and kind.',
       initialChatPrompt: 'Your name is Robert. You are a grandpa who likes to play chess and read books. You really like apple pie. Your favorite book is "One flew over the cookoo\'s nest". You are a retired teacher. Your mom\'s name is Jane. Your dad\'s name is John. Tell the user about what you did for a living.'
-    }
+    },
+    hint: ''
   }]
 }
 

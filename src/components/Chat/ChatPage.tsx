@@ -1,13 +1,14 @@
 import React, { useState } from 'react'
 import { Input, Spin } from 'antd'
-import { CheckCircleFilled, LogoutOutlined, SendOutlined, SettingOutlined, StopOutlined } from '@ant-design/icons'
+import { CheckCircleFilled, LogoutOutlined, QuestionCircleOutlined, SendOutlined, SettingOutlined, StopOutlined } from '@ant-design/icons'
 
 import { ChatData, useChatInfo } from '../../context/ChatContext'
 import './ChatPage.css'
 import { ChatBubble } from './ChatBubble'
-import { exitPrompt, objectivePrompt, settingsPrompt, typeMessagePrompt } from '../../utils/prompts'
+import { exitPrompt, hintPrompt, objectivePrompt, settingsPrompt, typeMessagePrompt } from '../../utils/prompts'
 import { useSettings } from '../../context/SettingsContext'
 import { SettingsModal } from '../SettingsModal/SettingsModal'
+import { HintModal } from '../HintModal/HintModal'
 
 export const ChatPage: React.FC<ChatData & { index: number }> = props => {
   const { nativeLanguage, setLevel } = useSettings()
@@ -15,6 +16,7 @@ export const ChatPage: React.FC<ChatData & { index: number }> = props => {
   const [sendingContent, setSendingContent] = useState('')
   const [isResponding, setIsResponding] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [hintOpen, setHintOpen] = useState(false)
   const [hoverStates, setHoverStates] = useState<number[]>([])
 
   const sendMessage = async (): Promise<void> => {
@@ -32,6 +34,7 @@ export const ChatPage: React.FC<ChatData & { index: number }> = props => {
   return (
     <div className='chatWindowContain'>
       <SettingsModal open={settingsOpen} close={() => setSettingsOpen(false)} />
+      <HintModal open={hintOpen} close={() => setHintOpen(false)} />
       <div className='imageContain'>
         <ChatImage {...props} responding={isResponding} className='chatImage' />
       </div>
@@ -92,6 +95,10 @@ export const ChatPage: React.FC<ChatData & { index: number }> = props => {
             </div>
           </div>
           <div className='chatQuestMenu'>
+          <div className='chatQuestMenuItem' onClick={() => setHintOpen(true)}>
+              <QuestionCircleOutlined />
+              {hintPrompt(nativeLanguage)}
+            </div>
             <div className='chatQuestMenuItem' onClick={() => setSettingsOpen(true)}>
               <SettingOutlined />
               {settingsPrompt(nativeLanguage)}

@@ -476,6 +476,40 @@ export const objectivePrompt = (lang: Language): string => {
   }
 }
 
+export const hintPrompt = (lang: Language): string => {
+  switch (lang) {
+    case Language.English: return 'Hint'
+    case Language.Spanish: return 'Pista'
+    case Language.Portuguese: return 'Dica'
+    case Language.French: return 'Indice'
+    case Language.German: return 'Hinweis'
+    case Language.Polish: return 'Wskazówka'
+    case Language.Italian: return 'Suggerimento'
+    case Language.Japanese: return 'ヒント'
+    case Language.Chinese: return '提示'
+    case Language.Korean: return '힌트'
+    case Language.Dutch: return 'Hint'
+    case Language.Turkish: return 'İpucu'
+    case Language.Swedish: return 'Tips'
+    case Language.Indonesian: return 'Petunjuk'
+    case Language.Filipino: return 'Hint'
+    case Language.Ukrainian: return 'Підказка'
+    case Language.Greek: return 'Υπόδειξη'
+    case Language.Czech: return 'Nápověda'
+    case Language.Finnish: return 'Vihje'
+    case Language.Romanian: return 'Indiciu'
+    case Language.Russian: return 'Подсказка'
+    case Language.Danish: return 'Hint'
+    case Language.Bulgarian: return 'Подсказка'
+    case Language.Malay: return 'Petunjuk'
+    case Language.Slovak: return 'Nápoveda'
+    case Language.Croatian: return 'Napomena'
+    case Language.Arabic: return 'تلميح'
+    case Language.Tamil: return 'குறிப்பு'
+    case Language.Hindi: return 'संकेत'
+  }
+}
+
 export const translateSentencePrompt = (nativeLang: Language): string => {
   switch (nativeLang) {
     case Language.English: return `You are a translation model. You always translate the previous message into a different language. Translate the following message into ${getLanguageName(nativeLang, nativeLang)}.`
@@ -643,6 +677,40 @@ export const quest3Prompts = (lang: Language): { question: string, answer: strin
     case Language.Arabic: return [{ question: "اسم الأم", answer: 'جين' }, { question: "اسم الأب", answer: 'جون' }, { question: "اسم الأخ", answer: 'جاك' }]
     case Language.Tamil: return [{ question: "அம்மாவின் பெயர்", answer: 'ஜேன்' }, { question: "அப்பாவின் பெயர்", answer: 'ஜான்' }, { question: "சகோதரனின் பெயர்", answer: 'ஜாக்' }]
     case Language.Hindi: return [{ question: "माँ का नाम", answer: 'जेन' }, { question: "पापा का नाम", answer: 'जॉन' }, { question: "भाई का नाम", answer: 'जैक' }]
+  }
+}
+
+export const generateHintPrompt = (nativeLang: Language, foreignLang: Language, nativeQuestQuestion: string): string => {
+  switch (nativeLang) {
+    case Language.English: return `Give the user a hint on how to ask for someone's ${nativeQuestQuestion} in ${getLanguageName(foreignLang, nativeLang)}. Use simple language and avoid complex sentences.`
+    case Language.Spanish: return `Dale al usuario una pista sobre cómo pedir el ${nativeQuestQuestion} de alguien en ${getLanguageName(foreignLang, nativeLang)}. Utilice un lenguaje sencillo y evite las frases complejas.`
+    case Language.Portuguese: return `Dê ao usuário uma dica sobre como pedir o ${nativeQuestQuestion} de alguém em ${getLanguageName(foreignLang, nativeLang)}. Use linguagem simples e evite frases complexas.`
+    case Language.French: return `Donnez à l'utilisateur un indice sur la façon de demander le ${nativeQuestQuestion} de quelqu'un en ${getLanguageName(foreignLang, nativeLang)}. Utilisez un langage simple et évitez les phrases complexes.`
+    case Language.German: return `Geben Sie dem Benutzer einen Hinweis, wie er in ${getLanguageName(foreignLang, nativeLang)} nach der ${nativeQuestQuestion} einer anderen Person fragen kann. Verwenden Sie eine einfache Sprache und vermeiden Sie komplexe Sätze.`
+    case Language.Polish: return `Podaj użytkownikowi wskazówkę, jak poprosić o ${nativeQuestQuestion} kogoś w ${getLanguageName(foreignLang, nativeLang)}. Użyj prostego języka i unikaj złożonych zdań.`
+    case Language.Italian: return `Dai all'utente un suggerimento su come chiedere il ${nativeQuestQuestion} di qualcuno in ${getLanguageName(foreignLang, nativeLang)}. Usa un linguaggio semplice e evita frasi complesse.`
+    case Language.Japanese: return `ユーザーに、${getLanguageName(foreignLang, nativeLang)}で誰かの${nativeQuestQuestion}を尋ねる方法についてヒントを与えます。簡単な言葉を使い、複雑な文を避けてください。`
+    case Language.Chinese: return `给用户一些关于如何在${getLanguageName(foreignLang, nativeLang)}中询问某人的${nativeQuestQuestion}的提示。使用简单的语言，避免复杂的句子。`
+    case Language.Korean: return `사용자에게 ${getLanguageName(foreignLang, nativeLang)}에서 누군가의 ${nativeQuestQuestion}을 요청하는 방법에 대한 힌트를 제공하십시오. 간단한 언어를 사용하고 복잡한 문장을 피하십시오.`
+    case Language.Dutch: return `Geef de gebruiker een hint over hoe je iemand's ${nativeQuestQuestion} in ${getLanguageName(foreignLang, nativeLang)} kunt vragen. Gebruik eenvoudige taal en vermijd complexe zinnen.`
+    case Language.Turkish: return `Kullanıcıya, ${getLanguageName(foreignLang, nativeLang)}'de birinin ${nativeQuestQuestion}'ını nasıl isteyeceği konusunda bir ipucu verin. Basit bir dil kullanın ve karmaşık cümlelerden kaçının.`
+    case Language.Swedish: return `Ge användaren en ledtråd om hur man frågar efter någons ${nativeQuestQuestion} i ${getLanguageName(foreignLang, nativeLang)}. Använd enkelt språk och undvik komplexa meningar.`
+    case Language.Indonesian: return `Beri pengguna petunjuk tentang cara meminta ${nativeQuestQuestion} seseorang di ${getLanguageName(foreignLang, nativeLang)}. Gunakan bahasa sederhana dan hindari kalimat yang kompleks.`
+    case Language.Filipino: return `Bigyan ang user ng hint kung paano humingi ng ${nativeQuestQuestion} ng iba sa ${getLanguageName(foreignLang, nativeLang)}. Gumamit ng simpleng wika at iwasan ang mga komplikadong pangungusap.`
+    case Language.Ukrainian: return `Дайте користувачеві підказку, як попросити ${nativeQuestQuestion} когось в ${getLanguageName(foreignLang, nativeLang)}. Використовуйте просту мову та уникайте складних речень.`
+    case Language.Greek: return `Δώστε στον χρήστη μια υπόδειξη για το πώς να ζητήσει το ${nativeQuestQuestion} κάποιου στα ${getLanguageName(foreignLang, nativeLang)}. Χρησιμοποιήστε απλή γλώσσα και αποφύγετε τις πολύπλοκες προτάσεις.`
+    case Language.Czech: return `Dejte uživateli tip, jak požádat o ${nativeQuestQuestion} někoho v ${getLanguageName(foreignLang, nativeLang)}. Použijte jednoduchý jazyk a vyhněte se složitým větám.`
+    case Language.Finnish: return `Anna käyttäjälle vihje siitä, miten pyytää jonkun ${nativeQuestQuestion} ${getLanguageName(foreignLang, nativeLang)}. Käytä yksinkertaista kieltä ja vältä monimutkaisia lauseita.`
+    case Language.Romanian: return `Oferiți utilizatorului un indiciu despre cum să solicite ${nativeQuestQuestion} cuiva în ${getLanguageName(foreignLang, nativeLang)}. Utilizați un limbaj simplu și evitați propozițiile complexe.`
+    case Language.Russian: return `Дайте пользователю подсказку, как попросить ${nativeQuestQuestion} кого-то в ${getLanguageName(foreignLang, nativeLang)}. Используйте простой язык и избегайте сложных предложений.`
+    case Language.Danish: return `Giv brugeren et tip om, hvordan man beder om en persons ${nativeQuestQuestion} i ${getLanguageName(foreignLang, nativeLang)}. Brug et simpelt sprog og undgå komplekse sætninger.`
+    case Language.Bulgarian: return `Дайте на потребителя подсказка как да поиска ${nativeQuestQuestion} на някого в ${getLanguageName(foreignLang, nativeLang)}. Използвайте прост език и избягвайте сложни изречения.`
+    case Language.Malay: return `Berikan petunjuk kepada pengguna tentang bagaimana untuk meminta ${nativeQuestQuestion} seseorang di ${getLanguageName(foreignLang, nativeLang)}. Gunakan bahasa yang mudah difahami dan elakkan ayat yang kompleks.`
+    case Language.Slovak: return `Dajte používateľovi tip, ako požiadať o ${nativeQuestQuestion} niekoho v ${getLanguageName(foreignLang, nativeLang)}. Použite jednoduchý jazyk a vyhnite sa zložitým vetám.`
+    case Language.Croatian: return `Dajte korisniku savjet o tome kako zatražiti ${nativeQuestQuestion} nekoga u ${getLanguageName(foreignLang, nativeLang)}. Koristite jednostavan jezik i izbjegavajte složene rečenice.`
+    case Language.Arabic: return `أعط المستخدم تلميحًا حول كيفية طلب ${nativeQuestQuestion} شخص ما في ${getLanguageName(foreignLang, nativeLang)}. استخدم لغة بسيطة وتجنب الجمل المعقدة.`
+    case Language.Tamil: return `பயனருக்கு எப்படி யாராவது மற்றவரின் ${nativeQuestQuestion} கேள்விக்கு உதவுவது பற்றிய ஒரு குறிப்பை வழங்கவும். எளிதான மொழியை பயன்படுத்துங்கள் மற்றும் கடினமான வாக்குகளை தவிர்க்கவும்.`
+    case Language.Hindi: return `उपयोगकर्ता को बताएं कि ${getLanguageName(foreignLang, nativeLang)} में किसी की ${nativeQuestQuestion} कैसे मांगी जाए। सरल भाषा का उपयोग करें और जटिल वाक्यों से बचें।`
   }
 }
 
